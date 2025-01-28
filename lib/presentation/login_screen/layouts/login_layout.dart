@@ -3,14 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 
-class CircleLayoutSignup extends StatefulWidget {
-  const CircleLayoutSignup({super.key});
+class CircleLayoutLogin extends StatefulWidget {
+  const CircleLayoutLogin({super.key});
 
   @override
-  State<CircleLayoutSignup> createState() => _CircleLayoutState();
+  State<CircleLayoutLogin> createState() => _CircleLayoutState();
 }
 
-class _CircleLayoutState extends State<CircleLayoutSignup> {
+class _CircleLayoutState extends State<CircleLayoutLogin> {
   bool isChecked = false;
 
   @override
@@ -29,16 +29,7 @@ class _CircleLayoutState extends State<CircleLayoutSignup> {
               height: 300.h,
             ),
           ),
-          Positioned(
-            bottom: 620.h,
-            right: 25.w,
-            child: Image.asset(
-              ImageAssets.signupScreenCircle2,
-              color: AppArray().colors[0],
-              width: 150.w,
-              height: 150.h,
-            ),
-          ),
+          
           Positioned(
             top: 20.r,
             left: 20.r,

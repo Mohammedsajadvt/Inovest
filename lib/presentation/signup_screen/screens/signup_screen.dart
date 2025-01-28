@@ -11,7 +11,7 @@ class SignupScreen extends StatelessWidget {
     return  SafeArea(
       child: Scaffold(
         backgroundColor: AppArray().colors[1],
-        body:CircleLayout(),
+        body:CircleLayoutSignup(),
       ),
     );
   }
