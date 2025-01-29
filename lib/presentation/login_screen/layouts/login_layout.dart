@@ -20,16 +20,15 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
         alignment: Alignment.topRight,
         children: [
           Positioned(
-            top: -100.r,
-            right: -60.r,
+            top: -110.r,
+            right: -110.r,
             child: Image.asset(
-              ImageAssets.signupScreenCircle1,
+              ImageAssets.loginScreenCircle,
               color: AppArray().colors[0],
               width: 300.w,
               height: 300.h,
             ),
           ),
-          
           Positioned(
             top: 20.r,
             left: 20.r,
@@ -39,10 +38,10 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
             ),
           ),
           Positioned(
-            left: 30,
-            top: 100,
+            left: 28.r,
+            top: 80.r,
             child: Text(
-              'Sign up',
+              'Login',
               style: TextStyle(
                 fontSize: 40.sp,
                 color: AppArray().colors[5],
@@ -52,25 +51,7 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 180.h),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 30,
-                ).r,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Name',
-                    hintStyle: TextStyle(color: AppArray().colors[3]),
-                    enabledBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppArray().colors[4]),
-                    ),
-                    focusedBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color:AppArray().colors[4]),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 220.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
                 child: TextFormField(
@@ -86,7 +67,23 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                   ),
                 ),
               ),
-              SizedBox(height: 10.h),
+              Padding(
+                padding: const EdgeInsets.only(top: 0, left: 250).r,
+                child: GestureDetector(
+                  onTap: (){},
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'forgot password?',
+                          style: TextStyle(color: AppArray().colors[5],fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
                 child: TextFormField(
@@ -119,7 +116,7 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                     ),
                     Expanded(
                       child: Text(
-                        'By clicking this I agree to the terms & policy',
+                        'Keep me signed in',
                         style: TextStyle(color: AppArray().colors[5]),
                       ),
                     ),
@@ -139,7 +136,7 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                     ),
                     child: Center(
                       child: Text(
-                        'Sign up',
+                        'Login',
                         style: TextStyle(
                             color: AppArray().colors[1],
                             fontSize: 16.sp,
@@ -154,7 +151,7 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                 child: GestureDetector(
                   onTap: (){},
                   child: Text(
-                    'Already have an account? Login',
+                    'Create new account',
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                       color: AppArray().colors[3],
@@ -164,9 +161,9 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 145).r,
+                padding: const EdgeInsets.only(left: 145).r,
                 child: Image.asset(
-                  ImageAssets.signup,
+                  ImageAssets.login,
                   width: 300.w,
                   height: 300.h,
                 ),

@@ -48,8 +48,8 @@ class _CircleLayoutState extends State<CircleLayoutSignup> {
             ),
           ),
           Positioned(
-            left: 30,
-            top: 100,
+            left: 30.r,
+            top: 100.r,
             child: Text(
               'Sign up',
               style: TextStyle(
