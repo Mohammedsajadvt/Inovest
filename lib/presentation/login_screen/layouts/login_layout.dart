@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
+import 'package:inovest/core/utils/custom_button.dart';
+import 'package:inovest/core/utils/custom_text_field.dart';
+import 'package:inovest/core/utils/index.dart';
 
-class CircleLayoutLogin extends StatefulWidget {
+class CircleLayoutLogin extends StatelessWidget {
   const CircleLayoutLogin({super.key});
-
-  @override
-  State<CircleLayoutLogin> createState() => _CircleLayoutState();
-}
-
-class _CircleLayoutState extends State<CircleLayoutLogin> {
-  bool isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,29 +51,22 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
               SizedBox(height: 220.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Email',
-                    hintStyle: TextStyle(color: AppArray().colors[3]),
-                    enabledBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color:AppArray().colors[4]),
-                    ),
-                    focusedBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppArray().colors[4]),
-                    ),
-                  ),
+                child: CustomTextField(
+                  hintText: 'Email',
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 0, left: 250).r,
+                padding: const EdgeInsets.only(top: 1, left: 246).r,
                 child: GestureDetector(
-                  onTap: (){},
+                  onTap: () {},
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           'forgot password?',
-                          style: TextStyle(color: AppArray().colors[5],fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: AppArray().colors[5],
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -86,17 +76,8 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
               SizedBox(height: 20.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                    hintStyle: TextStyle(color: AppArray().colors[3]),
-                    enabledBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppArray().colors[4]),
-                    ),
-                    focusedBorder:  UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppArray().colors[4]),
-                    ),
-                  ),
+                child: CustomTextField(
+                  hintText: 'Password',
                 ),
               ),
               Padding(
@@ -104,14 +85,17 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Checkbox(
-                      fillColor: WidgetStatePropertyAll(AppArray().colors[5]),
-                      checkColor: AppArray().colors[1],
-                      value: isChecked,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isChecked = value!;
-                        });
+                    BlocBuilder<CheckBoxBloc, CheckBoxState>(
+                      builder: (context, state) {
+                        return Checkbox(
+                          fillColor:
+                              WidgetStatePropertyAll(AppArray().colors[5]),
+                          checkColor: AppArray().colors[1],
+                          value: state.isChecked,
+                          onChanged: (_) {
+                           context.read<CheckBoxBloc>().add(ToggleCheckbox());
+                          },
+                        );
                       },
                     ),
                     Expanded(
@@ -125,31 +109,17 @@ class _CircleLayoutState extends State<CircleLayoutLogin> {
               ),
               SizedBox(height: 70.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 80).r,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: AppArray().colors[0],
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                            color: AppArray().colors[1],
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+                  padding: EdgeInsets.symmetric(horizontal: 80).r,
+                  child: CustomButton(
+                    title: 'Login',
+                    backgroundColor: AppArray().colors[0],
+                    textColor: AppArray().colors[1],
+                    onTap: () {},
+                  )),
               SizedBox(height: 10.h),
               Center(
                 child: GestureDetector(
-                  onTap: (){},
+                  onTap: () {},
                   child: Text(
                     'Create new account',
                     style: TextStyle(

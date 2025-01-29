@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
+import 'package:inovest/core/utils/custom_button.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -16,7 +17,7 @@ class LandingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            //  Center(child: Image.asset(ImageAssets.logo)),
+            //Center(child: Image.asset(ImageAssets.logo)),
             Padding(
               padding: EdgeInsets.only(left: 30.r, right: 30.r),
               child: GestureDetector(
@@ -59,45 +60,14 @@ class LandingScreen extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.only(left: 70.r, right: 70.r),
-              child: GestureDetector(
-                onTap: (){},
-                child: Container(
-                  height: 50.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(color: AppArray().colors[0])),
-                  child: Center(
-                      child: Text(
-                    'Login',
-                    style: TextStyle(
-                        color: AppArray().colors[0],fontSize: 16.sp, fontWeight: FontWeight.bold),
-                  )),
-                ),
-              ),
+              child: CustomButton(textColor: AppArray().colors[0],title: 'Login', backgroundColor: AppArray().colors[1],onTap: (){}),
             ),
             SizedBox(
               height: 5.h,
             ),
             Padding(
               padding: EdgeInsets.only(left: 70.r, right: 70.r),
-              child: GestureDetector(
-                onTap: (){},
-                child: Container(
-                  height: 50.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppArray().colors[0],
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                      child: Text(
-                    'Sign up',
-                    style: TextStyle(
-                        color: AppArray().colors[1], fontSize: 16.sp, fontWeight: FontWeight.bold),
-                  )),
-                ),
-              ),
+              child: CustomButton(title: 'Sign up', backgroundColor: AppArray().colors[0], textColor: AppArray().colors[1],onTap: (){})
             ),
           ],
         ),
@@ -105,3 +75,4 @@ class LandingScreen extends StatelessWidget {
     );
   }
 }
+
