@@ -1,5 +1,5 @@
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
-
+import 'package:inovest/presentation/home_screen/screens/home_screen.dart';
 import '/core/utils/index.dart';
 
 void main() {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-      child: LandingScreen(),
+      child: LoginScreen(),
     );
   }
 }

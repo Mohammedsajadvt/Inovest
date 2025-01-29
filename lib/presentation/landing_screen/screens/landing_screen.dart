@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';
@@ -17,7 +16,7 @@ class LandingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            //Center(child: Image.asset(ImageAssets.logo)),
+            Center(child: Image.asset(ImageAssets.langingScreenLogo,color: AppArray().colors[0],height: 570.h,)),
             Padding(
               padding: EdgeInsets.only(left: 30.r, right: 30.r),
               child: GestureDetector(

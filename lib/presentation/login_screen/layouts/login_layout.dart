@@ -6,6 +6,7 @@ import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 import 'package:inovest/core/utils/index.dart';
+import 'package:inovest/presentation/home_screen/screens/home_screen.dart';
 
 class CircleLayoutLogin extends StatelessWidget {
   const CircleLayoutLogin({super.key});
@@ -93,7 +94,7 @@ class CircleLayoutLogin extends StatelessWidget {
                           checkColor: AppArray().colors[1],
                           value: state.isChecked,
                           onChanged: (_) {
-                           context.read<CheckBoxBloc>().add(ToggleCheckbox());
+                            context.read<CheckBoxBloc>().add(ToggleCheckbox());
                           },
                         );
                       },
@@ -114,7 +115,11 @@ class CircleLayoutLogin extends StatelessWidget {
                     title: 'Login',
                     backgroundColor: AppArray().colors[0],
                     textColor: AppArray().colors[1],
-                    onTap: () {},
+                    onTap: () {
+                      context.read<ThemeBloc>().add(SetInvestorThemeEvent());
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => HomeScreen()));
+                    },
                   )),
               SizedBox(height: 10.h),
               Center(
