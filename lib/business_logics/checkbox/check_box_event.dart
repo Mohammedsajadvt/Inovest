@@ -8,5 +8,3 @@ abstract class CheckBoxEvent extends Equatable {
 }
 
 class ToggleCheckbox extends CheckBoxEvent {}
-
-

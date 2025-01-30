@@ -88,11 +88,14 @@ class CircleLayoutLogin extends StatelessWidget {
                   children: [
                     BlocBuilder<CheckBoxBloc, CheckBoxState>(
                       builder: (context, state) {
+                        bool isChecked =
+                            state is CheckboxToggled ? state.isChecked : false;
+
                         return Checkbox(
                           fillColor:
                               WidgetStatePropertyAll(AppArray().colors[5]),
                           checkColor: AppArray().colors[1],
-                          value: state.isChecked,
+                          value: isChecked,
                           onChanged: (_) {
                             context.read<CheckBoxBloc>().add(ToggleCheckbox());
                           },

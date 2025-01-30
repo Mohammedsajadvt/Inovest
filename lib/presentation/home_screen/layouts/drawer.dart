@@ -9,7 +9,7 @@ class CustomDrawer extends StatelessWidget {
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
 
-  CustomDrawer({
+  const CustomDrawer({super.key, 
     required this.username,
     required this.email,
     required this.onHomeTap,
@@ -29,7 +29,7 @@ class CustomDrawer extends StatelessWidget {
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(
                 color: AppArray().colors[1],
-                border: null,
+                border: Border(bottom: BorderSide(color:AppArray().colors[3],width: 0)),
                 boxShadow: [],
               ),
               accountName: Text(
@@ -42,10 +42,6 @@ class CustomDrawer extends StatelessWidget {
                 backgroundColor: Colors.orange,
                 child: Text(username[0], style: TextStyle(fontSize: 40)),
               ),
-            ),
-            Divider(
-              color: AppArray().colors[3],
-              thickness: 0,
             ),
             ListTile(
               leading: Icon(Icons.email_outlined, color: AppArray().colors[5]),
