@@ -4,10 +4,12 @@ import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/firebase_options.dart';
 import '/core/utils/index.dart';
 
-Future<void> main() async{
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);  runApp(
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
     MultiBlocProvider(providers: [
       BlocProvider(
         create: (context) => ThemeBloc(),
