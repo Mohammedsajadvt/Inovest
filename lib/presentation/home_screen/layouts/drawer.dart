@@ -9,7 +9,8 @@ class CustomDrawer extends StatelessWidget {
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
 
-  const CustomDrawer({super.key, 
+  const CustomDrawer({
+    super.key,
     required this.username,
     required this.email,
     required this.onHomeTap,
@@ -26,21 +27,23 @@ class CustomDrawer extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            UserAccountsDrawerHeader(
-              decoration: BoxDecoration(
-                color: AppArray().colors[1],
-                border: Border(bottom: BorderSide(color:AppArray().colors[3],width: 0)),
-                boxShadow: [],
-              ),
-              accountName: Text(
-                username,
-                style: TextStyle(color: AppArray().colors[5]),
-              ),
-              accountEmail:
-                  Text(email, style: TextStyle(color: AppArray().colors[3])),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
-                child: Text(username[0], style: TextStyle(fontSize: 40)),
+            Material(
+              elevation: 0, 
+              color: AppArray().colors[1],
+              child: UserAccountsDrawerHeader(
+                decoration: BoxDecoration(
+                  color: AppArray().colors[1],
+                ),
+                accountName: Text(
+                  username,
+                  style: TextStyle(color: AppArray().colors[5]),
+                ),
+                accountEmail:
+                    Text(email, style: TextStyle(color: AppArray().colors[3])),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.orange,
+                  child: Text(username[0], style: TextStyle(fontSize: 40)),
+                ),
               ),
             ),
             ListTile(
@@ -94,12 +97,18 @@ class CustomDrawer extends StatelessWidget {
               ),
               onTap: onSettingsTap,
             ),
-            SizedBox(height: 250,),
+             Divider(
+              color: AppArray().colors[3],
+              thickness: 0,
+            ),
+            SizedBox(
+              height: 250,
+            ),
             Divider(
               color: AppArray().colors[5],
             ),
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.red),
+              leading: Icon(Icons.logout, color: AppArray().colors[5]),
               title: Text(
                 'Log out',
                 style:

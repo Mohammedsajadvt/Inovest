@@ -1,9 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
-import 'package:inovest/presentation/home_screen/screens/home_screen.dart';
+import 'package:inovest/core/utils/app_routes.dart';
+import 'package:inovest/firebase_options.dart';
 import '/core/utils/index.dart';
 
-void main() {
-  runApp(
+Future<void> main() async{
+await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);  runApp(
     MultiBlocProvider(providers: [
       BlocProvider(
         create: (context) => ThemeBloc(),
@@ -32,11 +36,12 @@ class MyApp extends StatelessWidget {
               title: 'Flutter Demo',
               theme: state.themeData,
               home: child,
+              initialRoute: AppRoutes.splash,
+              routes: AppRoutes.routes,
             );
           },
         );
       },
-      child: SignupScreen(),
     );
   }
 }
