@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/auth/auth_state.dart';
@@ -9,17 +8,29 @@ import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 import 'package:inovest/core/utils/index.dart';
-import 'package:inovest/presentation/home_screen/screens/home_screen.dart';
 
-class CircleLayoutLogin extends StatelessWidget {
+
+class CircleLayoutLogin extends StatefulWidget {
   const CircleLayoutLogin({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    TextEditingController _emailController = TextEditingController();
-    TextEditingController _passwordController = TextEditingController();
-    final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  State<CircleLayoutLogin> createState() => _CircleLayoutLoginState();
+}
 
+class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Stack(
         alignment: Alignment.topRight,
@@ -38,7 +49,9 @@ class CircleLayoutLogin extends StatelessWidget {
             top: 20.r,
             left: 20.r,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+              },
               child: Icon(Icons.arrow_back, size: 24.sp),
             ),
           ),
@@ -59,35 +72,50 @@ class CircleLayoutLogin extends StatelessWidget {
               SizedBox(height: 220.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: CustomTextField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 1, left: 246).r,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Row(
+                child: Form(
+                  key: _loginFormKey,
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: Text(
-                          'forgot password?',
-                          style: TextStyle(
-                              color: AppArray().colors[5],
-                              fontWeight: FontWeight.bold),
+                      CustomTextField(
+                        controller: _emailController,
+                        hintText: 'Email',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6, left: 210).r,
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'forgot password?',
+                                style: TextStyle(
+                                   decoration: TextDecoration.underline,
+                                    color: AppArray().colors[5],
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
+                      ),
+                      CustomTextField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        },
                       ),
                     ],
                   ),
-                ),
-              ),
-              SizedBox(height: 20.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: CustomTextField(
-                  controller: _passwordController,
-                  hintText: 'Password',
                 ),
               ),
               Padding(
@@ -123,32 +151,37 @@ class CircleLayoutLogin extends StatelessWidget {
               SizedBox(height: 70.h),
               BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, state) {
-                  if(state is AuthLoading){
-                    return CircularProgressIndicator();
+                  if (state is AuthLoading) {
+                    return Center(child: CircularProgressIndicator(color: AppArray().colors[0],));
                   }
                   return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 80).r,
-                      child: CustomButton(
-                        title: 'Login',
-                        backgroundColor: AppArray().colors[0],
-                        textColor: AppArray().colors[1],
-                        onTap: () {
+                    padding: EdgeInsets.symmetric(horizontal: 80).r,
+                    child: CustomButton(
+                      title: 'Login',
+                      backgroundColor: AppArray().colors[0],
+                      textColor: AppArray().colors[1],
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+
+                        if (_loginFormKey.currentState?.validate() ?? false) {
                           final email = _emailController.text.trim();
                           final password = _passwordController.text.trim();
+                          
                           context.read<AuthBloc>().add(
-                              LoginEvent(email: email, password: password));
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen()));
-                                  print(email);
-                        },
-                      ));
+                                LoginEvent(email: email, password: password),
+                              );
+                        }
+                      },
+                    ),
+                  );
                 },
               ),
               SizedBox(height: 10.h),
               Center(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/signup');
+                  },
                   child: Text(
                     'Create new account',
                     style: TextStyle(

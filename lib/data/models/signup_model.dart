@@ -1,47 +1,28 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 class SignUpModel {
-    final String name;
-    final String email;
-    final String password;
-    final String role;
+  final bool success;
+  final String name;
+  final String email;
+  final String password;
+  final String role;
+  final String message;
 
-    SignUpModel({
-        required this.name,
-        required this.email,
-        required this.password,
-        required this.role,
-    });
+  SignUpModel({
+    required this.success,
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.role,
+    required this.message
+  });
 
-    SignUpModel copyWith({
-        String? name,
-        String? email,
-        String? password,
-        String? role,
-    }) => 
-        SignUpModel(
-            name: name ?? this.name,
-            email: email ?? this.email,
-            password: password ?? this.password,
-            role: role ?? this.role,
-        );
-
-    factory SignUpModel.fromRawJson(String str) => SignUpModel.fromJson(json.decode(str));
-
-    String toRawJson() => json.encode(toJson());
-
-    factory SignUpModel.fromJson(Map<String, dynamic> json) => SignUpModel(
+  factory SignUpModel.fromJson(Map<String, dynamic> json) => SignUpModel(
+        success: json["success"] ?? false,
         name: json["name"],
         email: json["email"],
         password: json["password"],
         role: json["role"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "name": name,
-        "email": email,
-        "password": password,
-        "role": role,
-    };
+        message: json["message"],
+      );
 }

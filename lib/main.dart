@@ -4,7 +4,7 @@ import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/data/services/auth_service.dart';
 import '/core/utils/index.dart';
 
-Future<void> main() async {
+void main()  {
   final AuthService authService = AuthService();
   runApp(
     MultiBlocProvider(providers: [
@@ -16,7 +16,7 @@ Future<void> main() async {
       ),
       BlocProvider(
         create: (context) => AuthBloc(authService: authService),
-      )
+      ),
     ], child: MyApp()),
   );
 }
