@@ -8,6 +8,5 @@ class AppArray{
     Color(0xff797878),
     Color(0xff000000),
     Color(0xff1D1D1D),
-    Color(0xff27285B),
   ];
 }

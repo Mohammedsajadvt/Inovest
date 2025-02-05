@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/data/models/login_model.dart';
 import 'package:http/http.dart' as http;
@@ -16,18 +15,20 @@ class AuthService {
         body: jsonEncode({"email": email, "password": password}),
       );
       print(response.body);
+
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
         return LoginModel.fromJson(jsonDecode(response.body));
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return LoginModel.fromJson(errorResponse);
       }
     } catch (e) {
-      return LoginModel(success: false, message: "Something went wrong: $e");
+      print('Login failed: $e');
+      return LoginModel(success: false);
     }
   }
 
-  Future<SignUpModel?> signupUser(
-      String name, String password, String email, String role) async {
+  Future<SignUpModel?> signupUser(String name, String password, String email, String role) async {
     final String url = "${ApiConstants.baseUrl}${ApiConstants.signupEndpoint}";
 
     try {
@@ -38,13 +39,16 @@ class AuthService {
             {"name": name, "email": email, "password": password, "role": role}),
       );
       print(response.body);
+
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
         return SignUpModel.fromJson(jsonDecode(response.body));
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return SignUpModel.fromJson(errorResponse);
       }
     } catch (e) {
-      throw ("Signup Failed");
+      print('Signup failed: $e');
+      throw "Signup Failed";
     }
   }
 }

@@ -17,22 +17,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+  emit(AuthLoading());
 
-    final LoginModel? response =
-        await authService.loginUser(event.email, event.password);
+  final LoginModel? response = await authService.loginUser(event.email, event.password);
 
-    if (response!.success &&
-        response.accessToken != null &&
-        response.refreshToken != null) {
-      emit(AuthSuccess(
-        accessToken: response.accessToken!,
-        refreshToken: response.refreshToken!,
-      ));
-    } else {
-      emit(AuthFailure(message: response.message ?? "Login failed"));
-    }
+  if (response != null && response.success && response.data != null) {
+    final user = response.data?.user;
+    final accessToken = response.data?.tokens?.accessToken;
+    final refreshToken = response.data?.tokens?.refreshToken;
+
+    emit(AuthSuccess(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      message: "Login successful",
+      role: user?.role, 
+    ));
+  } else {
+    emit(AuthFailure(message:"Login failed"));
   }
+}
+
 
   Future<void> _onSignup(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());

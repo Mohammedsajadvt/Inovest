@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
+import 'package:inovest/core/theme/theme.dart';
 import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/data/services/auth_service.dart';
 import '/core/utils/index.dart';
@@ -22,9 +23,7 @@ Future<void> main() async {
 >>>>>>> 30ca87d6817116739782f7d1759198a2e6408e42
   runApp(
     MultiBlocProvider(providers: [
-      BlocProvider(
-        create: (context) => ThemeBloc(),
-      ),
+
       BlocProvider(
         create: (context) => CheckBoxBloc(),
       ),
@@ -45,6 +44,7 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
+<<<<<<< Updated upstream
         return BlocBuilder<ThemeBloc, ThemeState>(
           builder: (context, state) {
             return MaterialApp(
@@ -56,6 +56,14 @@ class MyApp extends StatelessWidget {
               routes: AppRoutes.routes,
             );
           },
+=======
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          home: child,
+          initialRoute: AppRoutes.entrepreneurHome,
+          routes: AppRoutes.routes,
+>>>>>>> Stashed changes
         );
       },
     );

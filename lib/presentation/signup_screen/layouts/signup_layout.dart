@@ -5,7 +5,6 @@ import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/auth/auth_state.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
-import 'package:inovest/business_logics/theme/theme_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';

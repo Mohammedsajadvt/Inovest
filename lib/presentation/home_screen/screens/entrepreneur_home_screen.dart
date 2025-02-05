@@ -3,13 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer.dart';
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class EntrepreneurHomeScreen extends StatelessWidget {
+  const EntrepreneurHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppArray().colors[2],
+        foregroundColor: AppArray().colors[1],
         automaticallyImplyLeading: false,  
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -76,6 +78,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: (){},backgroundColor: AppArray().colors[1],foregroundColor: AppArray().colors[4],child:  Icon(Icons.add),),
       drawer: CustomDrawer(
         username: "John",
         email: "John@gmail.com",

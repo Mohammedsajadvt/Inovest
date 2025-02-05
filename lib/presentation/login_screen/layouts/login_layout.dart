@@ -9,7 +9,6 @@ import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 import 'package:inovest/core/utils/index.dart';
 
-
 class CircleLayoutLogin extends StatefulWidget {
   const CircleLayoutLogin({super.key});
 
@@ -96,7 +95,7 @@ class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
                               Text(
                                 'forgot password?',
                                 style: TextStyle(
-                                   decoration: TextDecoration.underline,
+                                    decoration: TextDecoration.underline,
                                     color: AppArray().colors[5],
                                     fontWeight: FontWeight.bold),
                               ),
@@ -149,32 +148,58 @@ class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
                 ),
               ),
               SizedBox(height: 70.h),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthLoading) {
-                    return Center(child: CircularProgressIndicator(color: AppArray().colors[0],));
-                  }
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 80).r,
-                    child: CustomButton(
-                      title: 'Login',
-                      backgroundColor: AppArray().colors[0],
-                      textColor: AppArray().colors[1],
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
+              BlocListener<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else if (state is AuthSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message ?? "Login successful"),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
 
-                        if (_loginFormKey.currentState?.validate() ?? false) {
-                          final email = _emailController.text.trim();
-                          final password = _passwordController.text.trim();
-                          
-                          context.read<AuthBloc>().add(
-                                LoginEvent(email: email, password: password),
-                              );
-                        }
-                      },
-                    ),
-                  );
+                    if (state.role == "INVESTOR") {
+                      Navigator.pushReplacementNamed(context,
+                          '/investorHome'); // Example route for Investor
+                    } else if (state.role == "ENTREPRENEUR") {
+
+                    } else {
+                    }
+                  }
                 },
+                child: BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    if (state is AuthLoading) {
+                      return Center(
+                          child: CircularProgressIndicator(
+                              color: AppArray().colors[0]));
+                    }
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 80).r,
+                      child: CustomButton(
+                        title: 'Login',
+                        backgroundColor: AppArray().colors[0],
+                        textColor: AppArray().colors[1],
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                          if (_loginFormKey.currentState?.validate() ?? false) {
+                            final email = _emailController.text.trim();
+                            final password = _passwordController.text.trim();
+                            context.read<AuthBloc>().add(
+                                LoginEvent(email: email, password: password));
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
               SizedBox(height: 10.h),
               Center(
