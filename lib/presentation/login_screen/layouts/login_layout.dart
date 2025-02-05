@@ -9,24 +9,14 @@ import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 import 'package:inovest/core/utils/index.dart';
 
-class CircleLayoutLogin extends StatefulWidget {
-  const CircleLayoutLogin({super.key});
+class CircleLayoutLogin extends StatelessWidget {
+  CircleLayoutLogin({super.key});
 
-  @override
-  State<CircleLayoutLogin> createState() => _CircleLayoutLoginState();
-}
-
-class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  final TextEditingController _passwordController = TextEditingController();
+
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -166,12 +156,11 @@ class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
                     );
 
                     if (state.role == "INVESTOR") {
-                      Navigator.pushReplacementNamed(context,
-                          '/investorHome'); // Example route for Investor
+                      Navigator.pushReplacementNamed(context, '/investorHome');
                     } else if (state.role == "ENTREPRENEUR") {
-
-                    } else {
-                    }
+                      Navigator.pushReplacementNamed(
+                          context, '/entrepreneurHome');
+                    } else {}
                   }
                 },
                 child: BlocBuilder<AuthBloc, AuthState>(

@@ -10,14 +10,10 @@ import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 
-class CircleLayoutSignup extends StatefulWidget {
-  const CircleLayoutSignup({super.key});
+// ignore: must_be_immutable
+class CircleLayoutSignup extends StatelessWidget {
+   CircleLayoutSignup({super.key});
 
-  @override
-  State<CircleLayoutSignup> createState() => _CircleLayoutSignupState();
-}
-
-class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -115,9 +111,7 @@ class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
                             ),
                           ),
                           onChanged: (String? value) {
-                            setState(() {
-                              selectedRole = value!;
-                            });
+                            selectedRole = value;
                           },
                           validator: (value) {
                             if (value == null) {
@@ -181,9 +175,6 @@ class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            Future.delayed(Duration(seconds: 1), () {
-                              Navigator.pushNamed(context, '/login');
-                            });
                           }
                         },
                         child: BlocBuilder<AuthBloc, AuthState>(
@@ -228,7 +219,6 @@ class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
                           ),
                         ),
                       ),
-                      // Signup Image
                       Padding(
                         padding: const EdgeInsets.only(right: 145).r,
                         child: Image.asset(
@@ -246,13 +236,5 @@ class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }
