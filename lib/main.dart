@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           home: child,
-          initialRoute: AppRoutes.login,
+          initialRoute: AppRoutes.splash,
           routes: AppRoutes.routes,
         );
       },

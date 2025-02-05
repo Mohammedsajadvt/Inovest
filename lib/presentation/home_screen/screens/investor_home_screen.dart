@@ -10,6 +10,8 @@ class InvestorHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppArray().colors[0],
+        foregroundColor: AppArray().colors[1],
         automaticallyImplyLeading: false,  
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(

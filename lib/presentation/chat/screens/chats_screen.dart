@@ -18,7 +18,7 @@ class ChatsScreen extends StatelessWidget {
             child: SearchBar(
               hintText: 'Search',
               leading: const Icon(Icons.search),
-              backgroundColor: WidgetStateProperty.all(AppArray().colors[1]),
+              backgroundColor: WidgetStateProperty.all(AppArray().colors[1]),              
             ),
           ),
         ),
