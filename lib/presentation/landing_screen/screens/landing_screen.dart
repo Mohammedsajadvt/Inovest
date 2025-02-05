@@ -16,11 +16,16 @@ class LandingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Center(child: Image.asset(ImageAssets.langingScreenLogo,color: AppArray().colors[0],height: 570.h,)),
+            Center(
+                child: Image.asset(
+              ImageAssets.langingScreenLogo,
+              color: AppArray().colors[0],
+              height: 570.h,
+            )),
             Padding(
               padding: EdgeInsets.only(left: 30.r, right: 30.r),
               child: GestureDetector(
-                onTap: (){},
+                onTap: () {},
                 child: Container(
                   width: double.infinity,
                   height: 50.h,
@@ -30,8 +35,8 @@ class LandingScreen extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'continue with google',
-                      style:
-                          TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -59,19 +64,29 @@ class LandingScreen extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.only(left: 70.r, right: 70.r),
-              child: CustomButton(textColor: AppArray().colors[0],title: 'Login', backgroundColor: AppArray().colors[1],onTap: (){}),
+              child: CustomButton(
+                  textColor: AppArray().colors[0],
+                  title: 'Login',
+                  backgroundColor: AppArray().colors[1],
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/login');
+                  }),
             ),
             SizedBox(
               height: 5.h,
             ),
             Padding(
-              padding: EdgeInsets.only(left: 70.r, right: 70.r),
-              child: CustomButton(title: 'Sign up', backgroundColor: AppArray().colors[0], textColor: AppArray().colors[1],onTap: (){})
-            ),
+                padding: EdgeInsets.only(left: 70.r, right: 70.r),
+                child: CustomButton(
+                    title: 'Sign up',
+                    backgroundColor: AppArray().colors[0],
+                    textColor: AppArray().colors[1],
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/signup');
+                    })),
           ],
         ),
       ),
     );
   }
 }
-

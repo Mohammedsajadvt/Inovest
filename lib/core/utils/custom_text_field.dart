@@ -3,13 +3,15 @@ import 'package:inovest/core/common/app_array.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
-  const CustomTextField({
-    super.key, required this.hintText,
+  TextEditingController controller;
+   CustomTextField({
+    super.key, required this.hintText,required this.controller
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       style: TextStyle(color: AppArray().colors[4]),
       cursorColor: AppArray().colors[5],
       decoration: InputDecoration(
@@ -22,6 +24,7 @@ class CustomTextField extends StatelessWidget {
           borderSide: BorderSide(color: AppArray().colors[4]),
         ),
       ),
+
     );
   }
 }

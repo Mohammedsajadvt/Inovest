@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:math';
+
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
+import 'package:inovest/business_logics/auth/auth_state.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
@@ -13,6 +16,10 @@ class CircleLayoutLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController _emailController = TextEditingController();
+    TextEditingController _passwordController = TextEditingController();
+    final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
     return SingleChildScrollView(
       child: Stack(
         alignment: Alignment.topRight,
@@ -53,6 +60,7 @@ class CircleLayoutLogin extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
                 child: CustomTextField(
+                  controller: _emailController,
                   hintText: 'Email',
                 ),
               ),
@@ -78,6 +86,7 @@ class CircleLayoutLogin extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
                 child: CustomTextField(
+                  controller: _passwordController,
                   hintText: 'Password',
                 ),
               ),
@@ -112,18 +121,30 @@ class CircleLayoutLogin extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 70.h),
-              Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 80).r,
-                  child: CustomButton(
-                    title: 'Login',
-                    backgroundColor: AppArray().colors[0],
-                    textColor: AppArray().colors[1],
-                    onTap: () {
-                      context.read<ThemeBloc>().add(SetInvestorThemeEvent());
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => HomeScreen()));
-                    },
-                  )),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if(state is AuthLoading){
+                    return CircularProgressIndicator();
+                  }
+                  return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 80).r,
+                      child: CustomButton(
+                        title: 'Login',
+                        backgroundColor: AppArray().colors[0],
+                        textColor: AppArray().colors[1],
+                        onTap: () {
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
+                          context.read<AuthBloc>().add(
+                              LoginEvent(email: email, password: password));
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()));
+                                  print(email);
+                        },
+                      ));
+                },
+              ),
               SizedBox(height: 10.h),
               Center(
                 child: GestureDetector(

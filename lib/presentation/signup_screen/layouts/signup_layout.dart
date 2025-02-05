@@ -10,6 +10,10 @@ class CircleLayoutSignup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController _nameController = TextEditingController();
+    TextEditingController _emailController = TextEditingController();
+    TextEditingController _passwordController = TextEditingController();
+
     return SingleChildScrollView(
       child: Stack(
         alignment: Alignment.topRight,
@@ -63,17 +67,22 @@ class CircleLayoutSignup extends StatelessWidget {
                 ).r,
                 child: CustomTextField(
                   hintText: 'Name',
+                  controller: _nameController,
                 ),
               ),
               SizedBox(height: 10.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: CustomTextField(hintText: 'Email'),
+                child: CustomTextField(hintText: 'Email',
+                controller: _emailController,
+                ),
               ),
               SizedBox(height: 10.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30).r,
-                child: CustomTextField(hintText: 'Password'),
+                child: CustomTextField(hintText: 'Password',
+                controller: _passwordController,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 0, left: 18).r,
@@ -82,14 +91,15 @@ class CircleLayoutSignup extends StatelessWidget {
                   children: [
                     BlocBuilder<CheckBoxBloc, CheckBoxState>(
                       builder: (context, state) {
-                        bool isChecked = state is CheckboxToggled ? state.isChecked : false;
+                        bool isChecked =
+                            state is CheckboxToggled ? state.isChecked : false;
                         return Checkbox(
                           fillColor:
                               WidgetStatePropertyAll(AppArray().colors[5]),
                           checkColor: AppArray().colors[1],
                           value: isChecked,
                           onChanged: (_) {
-                           context.read<CheckBoxBloc>().add(ToggleCheckbox());
+                            context.read<CheckBoxBloc>().add(ToggleCheckbox());
                           },
                         );
                       },

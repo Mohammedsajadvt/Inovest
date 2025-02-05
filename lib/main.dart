@@ -1,14 +1,11 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/core/utils/app_routes.dart';
-import 'package:inovest/firebase_options.dart';
+import 'package:inovest/data/services/auth_service.dart';
 import '/core/utils/index.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  final AuthService authService = AuthService();
   runApp(
     MultiBlocProvider(providers: [
       BlocProvider(
@@ -16,6 +13,9 @@ Future<void> main() async {
       ),
       BlocProvider(
         create: (context) => CheckBoxBloc(),
+      ),
+      BlocProvider(
+        create: (context) => AuthBloc(authService: authService),
       )
     ], child: MyApp()),
   );
