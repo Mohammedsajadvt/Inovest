@@ -11,17 +11,33 @@ import 'package:inovest/core/utils/custom_button.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
 
 // ignore: must_be_immutable
-class CircleLayoutSignup extends StatelessWidget {
-   CircleLayoutSignup({super.key});
+class CircleLayoutSignup extends StatefulWidget {
+   const CircleLayoutSignup({super.key});
 
+  @override
+  State<CircleLayoutSignup> createState() => _CircleLayoutSignupState();
+}
+
+class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
   final TextEditingController _nameController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
   final List<String> roles = ['INVESTOR', 'ENTREPRENEUR'];
+
   String? selectedRole;
 
   final GlobalKey<FormState> _signupFormKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _nameController;
+    _emailController;
+    _passwordController;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
