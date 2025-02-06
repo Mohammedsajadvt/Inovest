@@ -3,4 +3,5 @@ class SvgAssets {
   static const String help = 'assets/svg/help.svg';
   static const String mail = 'assets/svg/mail.svg';
   static const String settings = 'assets/svg/settings.svg';
+  static const String filter = 'assets/svg/filter.svg';
 }

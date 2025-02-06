@@ -32,10 +32,11 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
+          theme: ThemeData(fontFamily: "JosefinSans",),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           home: child,
-          initialRoute: AppRoutes.splash,
+          initialRoute: AppRoutes.entrepreneurHome,
           routes: AppRoutes.routes,
         );
       },
