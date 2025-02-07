@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 
-class CustomDrawer extends StatelessWidget {
+class EntrepreneurDrawer extends StatelessWidget {
   final String username;
   final String email;
   final VoidCallback onHomeTap;
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
 
-  const CustomDrawer({
+  const EntrepreneurDrawer({
     super.key,
     required this.username,
     required this.email,

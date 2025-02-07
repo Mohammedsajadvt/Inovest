@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/common/svg_assets.dart';
-import 'package:inovest/presentation/home_screen/layouts/drawer.dart';
+import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
 
 class EntrepreneurHomeScreen extends StatelessWidget {
   const EntrepreneurHomeScreen({super.key});
@@ -136,7 +136,7 @@ class EntrepreneurHomeScreen extends StatelessWidget {
   child: Icon(Icons.add),
 ),
 
-      drawer: CustomDrawer(
+      drawer: EntrepreneurDrawer(
         username: "John",
         email: "John@gmail.com",
         onHomeTap: () {},
@@ -149,7 +149,7 @@ class EntrepreneurHomeScreen extends StatelessWidget {
             height: 10.h,
           ),
           Padding(
-  padding: EdgeInsets.symmetric(horizontal: 15.w), // Ensure proper scaling for horizontal padding
+  padding: EdgeInsets.symmetric(horizontal: 15.w), 
   child: Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -176,10 +176,10 @@ Expanded(
     itemBuilder: (context, index) {
       return Card(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w), // Add padding for better spacing
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Allow dynamic height
-            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+            mainAxisSize: MainAxisSize.min, 
+            crossAxisAlignment: CrossAxisAlignment.start, 
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,7 +188,7 @@ Expanded(
                   Text('Rating: 5', style: TextStyle(fontSize: 12.sp)),
                 ],
               ),
-              SizedBox(height: 5.h), // Add spacing between title and description
+              SizedBox(height: 5.h), 
               Text(
                 'Description nnfnfnfnfnfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
                 style: TextStyle(fontSize: 12.sp),
