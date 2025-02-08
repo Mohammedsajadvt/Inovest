@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/auth/auth_state.dart';
-import 'package:inovest/data/models/login_model.dart';
-import 'package:inovest/data/models/signup_model.dart';
+import 'package:inovest/core/app_settings/secure_storage.dart';
+import 'package:inovest/data/models/auth_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -16,60 +14,75 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpEvent>(_onSignup);
   }
 
-  Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
+ Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
   emit(AuthLoading());
 
-  final LoginModel? response = await authService.loginUser(event.email, event.password);
+  final AuthModel? response = await authService.loginUser(event.email, event.password);
 
-  if (response != null && response.success && response.data != null) {
-    final user = response.data?.user;
-    final accessToken = response.data?.tokens?.accessToken;
-    final refreshToken = response.data?.tokens?.refreshToken;
+  if (response != null && response.success) {
+    final accessToken = response.data?.tokens?.accessToken ?? "";
+    final refreshToken = response.data?.tokens?.refreshToken ?? "";
+    final userRole = response.data?.user?.role ?? "GUEST"; // Default to "GUEST" if role is null
 
+    if (accessToken.isNotEmpty) {
+      await SecureStorage().saveToken(accessToken);
+      await SecureStorage().saveRole(userRole);
+    } else {
+      print("⚠️ No access token received.");
+    }
+
+    // Emit AuthSuccess with user details
     emit(AuthSuccess(
       accessToken: accessToken,
       refreshToken: refreshToken,
       message: "Login successful",
-      role: user?.role, 
+      role: userRole,
     ));
   } else {
-    emit(AuthFailure(message:"Login failed"));
+    emit(AuthFailure(message: "Login failed"));
   }
 }
 
+Future<void> _onSignup(SignUpEvent event, Emitter<AuthState> emit) async {
+  emit(AuthLoading());
 
-  Future<void> _onSignup(SignUpEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+  try {
+    final response = await authService.signupUser(
+      event.name,
+      event.password,
+      event.email,
+      event.role,
+    );
 
-    try {
-      final SignUpModel? response = await authService.signupUser(
-        event.name,
-        event.password,
-        event.email,
-        event.role,
-      );
+    if (response != null && response.success) {
+      print("✅ Signup successful! Now attempting login...");
 
-      if (response != null && response.success) {
-        emit(AuthSuccess(message: "User created successfully"));
+      final loginResponse = await authService.loginUser(event.email, event.password);
+
+      if (loginResponse != null && loginResponse.success) {
+        final accessToken = loginResponse.data?.tokens?.accessToken ?? "";
+        final refreshToken = loginResponse.data?.tokens?.refreshToken ?? "";
+        final userRole = loginResponse.data?.user?.role ?? event.role; // Use provided role if missing
+
+        if (accessToken.isNotEmpty) {
+          await SecureStorage().saveToken(accessToken);
+          await SecureStorage().saveRole(userRole);
+          print("✅ Tokens saved to SecureStorage.");
+        } else {
+          print("⚠️ No access token received after login.");
+        }
+
+        emit(AuthSuccess(message: "Signup & login successful!"));
       } else {
-        emit(AuthFailure(message: response?.message ?? "Signup failed"));
+        emit(AuthFailure(message: "Signup successful, but login failed. Please log in manually."));
       }
-    } catch (e) {
-      String errorMessage = "An unknown error occurred";
-
-      if (e is FormatException) {
-        errorMessage = "Invalid data format received. Please try again.";
-      } else if (e is TimeoutException) {
-        errorMessage = "The request timed out. Please try again.";
-      } else if (e is SocketException) {
-        errorMessage = "No internet connection. Please check your connection.";
-      } else {
-        // If it's a custom error, show that message
-        print('Error during signup: ${e.toString()}');
-      }
-
-      // Emit failure state with the custom error message
-      emit(AuthFailure(message: errorMessage));
+    } else {
+      emit(AuthFailure(message: "Signup failed. Please try again."));
     }
+  } catch (e) {
+    emit(AuthFailure(message: "An error occurred: ${e.toString()}"));
+    print('Signup Error: $e');
   }
+}
+
 }

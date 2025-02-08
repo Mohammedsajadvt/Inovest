@@ -1,30 +1,41 @@
-class LoginModel {
+class AuthModel {
   final bool success;
-  final LoginData? data;
+  final String message;
+  final AuthData? data;
 
-  LoginModel({required this.success, this.data});
+  AuthModel({
+    required this.success,
+    required this.message,
+    this.data,
+  });
 
-  factory LoginModel.fromJson(Map<String, dynamic> json) {
-    return LoginModel(
+  factory AuthModel.fromJson(Map<String, dynamic> json) {
+    return AuthModel(
       success: json['success'] ?? false,
-      data: json['data'] != null ? LoginData.fromJson(json['data']) : null,
+      message: json['message'] ?? '',
+      data: json['data'] != null ? AuthData.fromJson(json['data']) : null,
     );
   }
 }
 
-class LoginData {
+class AuthData {
   final Tokens tokens;
   final User user;
 
-  LoginData({required this.tokens, required this.user});
+  AuthData({
+    required this.tokens,
+    required this.user,
+  });
 
-  factory LoginData.fromJson(Map<String, dynamic> json) {
-    return LoginData(
+  factory AuthData.fromJson(Map<String, dynamic> json) {
+    return AuthData(
       tokens: Tokens.fromJson(json['tokens']),
       user: User.fromJson(json['user']),
     );
   }
 }
+
+
 
 class Tokens {
   final String accessToken;
@@ -44,15 +55,23 @@ class User {
   final String id;
   final String name;
   final String email;
+  final String imageUrl;
   final String role;
 
-  User({required this.id, required this.name, required this.email, required this.role});
+  User({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.imageUrl,
+    required this.role,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       name: json['name'],
       email: json['email'],
+      imageUrl: json['imageUrl'],
       role: json['role'],
     );
   }

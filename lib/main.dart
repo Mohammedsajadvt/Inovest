@@ -2,9 +2,12 @@ import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/data/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '/core/utils/index.dart';
 
-void main() {
+Future<void> main()async {
+   WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferences.getInstance();
   final AuthService authService = AuthService();
   runApp(
     MultiBlocProvider(
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           home: child,
-          initialRoute: AppRoutes.investorHome,
+          initialRoute: AppRoutes.splash,
           routes: AppRoutes.routes,
         );
       },
