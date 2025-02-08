@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';  // Import SharedPreferences
-import 'package:inovest/core/common/app_array.dart'; // Assuming you have some common assets
-import 'package:inovest/core/common/image_assets.dart'; // Assuming you have an image for splash screen
+import 'package:inovest/core/common/app_array.dart'; 
+import 'package:inovest/core/common/image_assets.dart'; 
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -13,8 +12,6 @@ class SplashScreen extends StatelessWidget {
   String? token = await secureStorage.getToken();
   String? role = await secureStorage.getRole();
 
-   print("Token: $token");
-  print("Role: $role");
 
   if (token != null && token.isNotEmpty) {
     if (role == "INVESTOR") {

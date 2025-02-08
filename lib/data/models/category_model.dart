@@ -1,28 +1,28 @@
 import 'dart:convert';
 
-class Category {
+class CategoryModel {
     final String name;
     final String description;
 
-    Category({
+    CategoryModel({
         required this.name,
         required this.description,
     });
 
-    Category copyWith({
+    CategoryModel copyWith({
         String? name,
         String? description,
     }) => 
-        Category(
+        CategoryModel(
             name: name ?? this.name,
             description: description ?? this.description,
         );
 
-    factory Category.fromRawJson(String str) => Category.fromJson(json.decode(str));
+    factory CategoryModel.fromRawJson(String str) => CategoryModel.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory Category.fromJson(Map<String, dynamic> json) => Category(
+    factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         name: json["name"],
         description: json["description"],
     );

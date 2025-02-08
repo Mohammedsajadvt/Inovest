@@ -1,14 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:inovest/business_logics/create_category/category_bloc.dart';
+import 'package:inovest/business_logics/create_category/category_event.dart';
+import 'package:inovest/business_logics/create_category/category_state.dart';
+import 'package:inovest/business_logics/get_category/get_categories_bloc.dart';
+import 'package:inovest/business_logics/get_category/get_categories_event.dart';
+import 'package:inovest/business_logics/get_category/get_categories_state.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/common/svg_assets.dart';
+import 'package:inovest/data/models/category_model.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
 
-class EntrepreneurHomeScreen extends StatelessWidget {
+class EntrepreneurHomeScreen extends StatefulWidget {
   const EntrepreneurHomeScreen({super.key});
 
+  @override
+  State<EntrepreneurHomeScreen> createState() => _EntrepreneurHomeScreenState();
+}
+
+class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
+  @override
+void initState() {
+  super.initState();
+  context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,59 +101,66 @@ class EntrepreneurHomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-  onPressed: () {
-    showDialog(
-      context: context,
-      builder: (context) {
-        TextEditingController titleController = TextEditingController();
-        TextEditingController descriptionController = TextEditingController();
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              TextEditingController titleController = TextEditingController();
+              TextEditingController descriptionController =
+                  TextEditingController();
 
-        return AlertDialog(
-          title: Text("Add Project"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: "Title"),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: "Description"),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                String title = titleController.text.trim();
-                String description = descriptionController.text.trim();
+              return AlertDialog(
+                backgroundColor: AppArray().colors[1],
+                title: Text("Add Project"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(labelText: "Title"),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: InputDecoration(labelText: "Description"),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: AppArray().colors[2]),
+                    ),
+                  ),
+                  BlocBuilder<CategoryBloc, CategoryState>(
+                    builder: (context, state) {
+                      return TextButton(
+                        onPressed: () {
+                          String name = titleController.text.trim();
+                          String description =
+                              descriptionController.text.trim();
 
-                if (title.isNotEmpty && description.isNotEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Added: $title - $description")),
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: Text("Save"),
-            ),
-          ],
-        );
-      },
-    );
-  },
-  backgroundColor: AppArray().colors[1],
-  foregroundColor: AppArray().colors[4],
-  child: Icon(Icons.add),
-),
-
+                          context
+                              .read<CategoryBloc>()
+                              .add(CreateCategoryEvent(name, description));
+                          Navigator.pop(context);
+                        },
+                        child: Text("Save",
+                            style: TextStyle(color: AppArray().colors[2])),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        backgroundColor: AppArray().colors[1],
+        foregroundColor: AppArray().colors[4],
+        child: Icon(Icons.add),
+      ),
       drawer: EntrepreneurDrawer(
         username: "John",
         email: "John@gmail.com",
@@ -143,66 +168,91 @@ class EntrepreneurHomeScreen extends StatelessWidget {
         onProfileTap: () {},
         onSettingsTap: () {},
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 10.h,
-          ),
-          Padding(
-  padding: EdgeInsets.symmetric(horizontal: 15.w), 
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        'My Projects',
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-      ),
-      Row(
-        children: [
-          Text(
-            'Sort by',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
-          ),
-          Icon(Icons.filter_alt),
-        ],
-      ),
-    ],
-  ),
-),
-Expanded(
-  child: ListView.builder(
-    itemCount: 10,
-    shrinkWrap: true,
-    itemBuilder: (context, index) {
-      return Card(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, 
-            crossAxisAlignment: CrossAxisAlignment.start, 
-            children: [
-              Row(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
+        },
+        child: Column(
+          children: [
+            SizedBox(
+              height: 10.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.w),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
-                  Text('Rating: 5', style: TextStyle(fontSize: 12.sp)),
+                  Text(
+                    'My Projects',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Sort by',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12.sp),
+                      ),
+                      Icon(Icons.filter_alt),
+                    ],
+                  ),
                 ],
               ),
-              SizedBox(height: 5.h), 
-              Text(
-                'Description nnfnfnfnfnfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-                style: TextStyle(fontSize: 12.sp),
-                softWrap: true,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 5,),
+            BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
+              builder: (context, state) {
+                if (state is GetCategoryLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is GetCategoryLoaded) {
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: state.categories.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          shape: Border.all(color:Color(0xffFCFCFE) ),
+                          color: Color(0xffFCFCFE),
+                          elevation: 2,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.h, horizontal: 10.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      state.categories[index].name,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('Rating :5⭐'),
+                                  ],
+                                ),
+                                SizedBox(height: 5.h),
+                                Text(state.categories[index].description),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                } else if (state is GetCategoryError) {
+                  return Center(
+                    child: Text(state.error),
+                  );
+                }
+                return SizedBox.shrink(); 
+              },
+            )
+          ],
         ),
-      );
-    },
-  ),
-),
-
-        ],
       ),
     );
   }

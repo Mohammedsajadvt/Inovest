@@ -233,7 +233,6 @@ class _CircleLayoutSignupState extends State<CircleLayoutSignup> {
                                     backgroundColor: Colors.green,
                                   ),
                                 );
-                                // Navigate to the appropriate home screen based on the role
                                 if (selectedRole == 'ENTREPRENEUR') {
                                   Navigator.pushReplacementNamed(
                                       context, '/entrepreneurHome');

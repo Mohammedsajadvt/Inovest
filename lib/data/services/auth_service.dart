@@ -18,11 +18,15 @@ class AuthService {
       if (response.statusCode == 200) {
         return AuthModel.fromJson(jsonDecode(response.body));
       } else {
-        return null;
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: responseBody['success'] ?? false,
+          message: responseBody['message'] ?? 'Unknown error',
+        );
       }
     } catch (e) {
       print('Login failed: $e');
-      return null;
+      return AuthModel(success: false, message: 'An error occurred: $e');
     }
   }
 
@@ -31,73 +35,64 @@ class AuthService {
     final String url = "${ApiConstants.baseUrl}${ApiConstants.signupEndpoint}";
 
     try {
-      print("Sending sign-up request to $url");
-      print("Request Body: ${jsonEncode({
-            "name": name,
-            "email": email,
-            "password": password,
-            "role": role
-          })}");
-
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(
-            {"name": name, "email": email, "password": password, "role": role}),
+        body: jsonEncode({
+          "name": name,
+          "email": email,
+          "password": password,
+          "role": role
+        }),
       );
-
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
 
       if (response.statusCode == 201) {
         return AuthModel.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            "Failed to sign up. Status Code: ${response.statusCode}");
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: responseBody['success'] ?? false,
+          message: responseBody['message'] ?? 'Unknown error',
+        );
       }
     } catch (e) {
       print('Signup failed: $e');
-      throw Exception("Error during sign up: $e");
+      return AuthModel(success: false, message: 'An error occurred: $e');
     }
   }
+
   Future<AuthModel?> refreshToken() async {
-  final String url = "${ApiConstants.baseUrl}${ApiConstants.refreshToken}";
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.refreshToken}";
 
-  try {
-    String? refreshToken = await SecureStorage().getToken();
-    if (refreshToken == null || refreshToken.isEmpty) {
-      print("❌ No refresh token available.");
-      return null;
-    }
-
-    print("🔄 Sending refresh token request...");
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"refreshToken": refreshToken}),
-    );
-
-    print("🟢 Refresh Token Response Status Code: ${response.statusCode}");
-    print("🟢 Refresh Token Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      if (jsonData.containsKey('tokens')) {
-        await SecureStorage().saveToken(jsonData['tokens']['accessToken']);
-        return AuthModel.fromJson(jsonData);
-      } else {
-        print("❌ No tokens received from refresh-token API.");
+    try {
+      String? refreshToken = await SecureStorage().getToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        print("❌ No refresh token available.");
         return null;
       }
-    } else {
-      print("❌ Refresh token request failed: Status Code ${response.statusCode}");
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"refreshToken": refreshToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        if (jsonData.containsKey('tokens')) {
+          await SecureStorage().saveToken(jsonData['tokens']['accessToken']);
+          return AuthModel.fromJson(jsonData); // Success
+        } else {
+          print("❌ No tokens received from refresh-token API.");
+          return null;
+        }
+      } else {
+        print("❌ Refresh token request failed.");
+        return null;
+      }
+    } catch (e) {
+      print("❌ Refresh token request error: $e");
       return null;
     }
-  } catch (e) {
-    print("❌ Refresh token request error: $e");
-    return null;
   }
-}
-
 }
