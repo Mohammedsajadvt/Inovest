@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/chat.dart';
 import '../../../data/models/message.dart';
-import '../widgets/message_bubble.dart';
-import '../widgets/chat_input.dart';
+import '../layouts/message_bubble.dart';
+import '../layouts/chat_input.dart';
 
 class ChatDetailScreen extends StatelessWidget {
   final Chat chat;

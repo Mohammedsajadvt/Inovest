@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:inovest/business_logics/create_category/category_bloc.dart';
-import 'package:inovest/business_logics/create_category/category_event.dart';
-import 'package:inovest/business_logics/create_category/category_state.dart';
-import 'package:inovest/business_logics/get_category/get_categories_bloc.dart';
-import 'package:inovest/business_logics/get_category/get_categories_event.dart';
-import 'package:inovest/business_logics/get_category/get_categories_state.dart';
+import 'package:inovest/business_logics/category/category_bloc.dart';
+import 'package:inovest/business_logics/category/category_event.dart';
+import 'package:inovest/business_logics/category/category_state.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
-import 'package:inovest/core/common/svg_assets.dart';
-import 'package:inovest/data/models/category_model.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
 
 class EntrepreneurHomeScreen extends StatefulWidget {
@@ -23,10 +17,11 @@ class EntrepreneurHomeScreen extends StatefulWidget {
 
 class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
   @override
-void initState() {
-  super.initState();
-  context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
-}
+  void initState() {
+    super.initState();
+    context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,67 +90,16 @@ void initState() {
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
               ),
-              onChanged: (value) {},
+              onChanged: (value) {
+                context.read<GetCategoriesBloc>().add(SearchCategoriesEvent(query: value));
+              },
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              TextEditingController titleController = TextEditingController();
-              TextEditingController descriptionController =
-                  TextEditingController();
-
-              return AlertDialog(
-                backgroundColor: AppArray().colors[1],
-                title: Text("Add Project"),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(labelText: "Title"),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: descriptionController,
-                      decoration: InputDecoration(labelText: "Description"),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(color: AppArray().colors[2]),
-                    ),
-                  ),
-                  BlocBuilder<CategoryBloc, CategoryState>(
-                    builder: (context, state) {
-                      return TextButton(
-                        onPressed: () {
-                          String name = titleController.text.trim();
-                          String description =
-                              descriptionController.text.trim();
-
-                          context
-                              .read<CategoryBloc>()
-                              .add(CreateCategoryEvent(name, description));
-                          Navigator.pop(context);
-                        },
-                        child: Text("Save",
-                            style: TextStyle(color: AppArray().colors[2])),
-                      );
-                    },
-                  ),
-                ],
-              );
-            },
-          );
+          Navigator.of(context).pushNamed('/project');
         },
         backgroundColor: AppArray().colors[1],
         foregroundColor: AppArray().colors[4],
@@ -174,9 +118,7 @@ void initState() {
         },
         child: Column(
           children: [
-            SizedBox(
-              height: 10.h,
-            ),
+            SizedBox(height: 10.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w),
               child: Row(
@@ -184,37 +126,51 @@ void initState() {
                 children: [
                   Text(
                     'My Projects',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Sort by',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12.sp),
+                  PopupMenuButton<bool>(
+                    onSelected: (ascending) {
+                      context.read<GetCategoriesBloc>().add(SortCategoriesEvent(ascending));
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: true,
+                        child: Text('Name Ascending'),
                       ),
-                      Icon(Icons.filter_alt),
+                      PopupMenuItem(
+                        value: false,
+                        child: Text('Name Descending'),
+                      ),
                     ],
+                    child: Row(
+                      children: [
+                        Text(
+                          'Sort by',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
+                        ),
+                        Icon(Icons.filter_alt),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 5,),
-            BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
-              builder: (context, state) {
-                if (state is GetCategoryLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is GetCategoryLoaded) {
-                  return Expanded(
-                    child: ListView.builder(
+            SizedBox(height: 5),
+            Expanded(
+              child: BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
+                builder: (context, state) {
+                  if (state is GetCategoryLoading) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (state is GetCategoryLoaded) {
+                    return ListView.builder(
                       itemCount: state.categories.length,
                       itemBuilder: (context, index) {
+                        final category = state.categories[index];
                         return Card(
-                          shape: Border.all(color:Color(0xffFCFCFE) ),
-                          color: Color(0xffFCFCFE),
+                          shape: Border.all(color: const Color(0xffFCFCFE)),
+                          color: const Color(0xffFCFCFE),
                           elevation: 2,
                           child: Padding(
                             padding: EdgeInsets.symmetric(
@@ -223,34 +179,32 @@ void initState() {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      state.categories[index].name,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      category.name,
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
                                     ),
-                                    Text('Rating :5⭐'),
+                                    const Text('Rating: 5⭐'),
                                   ],
                                 ),
                                 SizedBox(height: 5.h),
-                                Text(state.categories[index].description),
+                                Text(category.description),
                               ],
                             ),
                           ),
                         );
                       },
-                    ),
-                  );
-                } else if (state is GetCategoryError) {
-                  return Center(
-                    child: Text(state.error),
-                  );
-                }
-                return SizedBox.shrink(); 
-              },
-            )
+                    );
+                  } else if (state is GetCategoryError) {
+                    return Center(
+                      child: Text(state.error),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
           ],
         ),
       ),

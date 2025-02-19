@@ -1,4 +1,5 @@
 import 'package:inovest/core/utils/index.dart';
+import 'package:inovest/presentation/add_project_screen/add_project_screen.dart';
 import 'package:inovest/presentation/chat/screens/chats_screen.dart';
 import 'package:inovest/presentation/home_screen/screens/entrepreneur_home_screen.dart';
 import 'package:inovest/presentation/home_screen/screens/investor_home_screen.dart';
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String chats = '/chats';
   static const String entrepreneurHome = '/entrepreneurHome';
   static const String investorHome = '/investorHome';
+  static const String project = '/project';
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => SplashScreen(),
     landing: (context) => LandingScreen(),
@@ -20,5 +22,6 @@ class AppRoutes {
     chats: (context) => const ChatsScreen(),
     entrepreneurHome:(context) => const EntrepreneurHomeScreen(),
     investorHome:(context) => const InvestorHomeScreen(),
+    project:(context) => const AddProjectScreen()
   };
 }

@@ -88,7 +88,7 @@ class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
                         },
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 6, left: 210).r,
+                        padding: const EdgeInsets.only(top: 6, left: 200).r,
                         child: GestureDetector(
                           onTap: () {},
                           child: Row(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inovest/core/common/app_array.dart';
-import '../widgets/chat_list_item.dart';
+import '../layouts/chat_list_item.dart';
 import '../../../data/models/chat.dart';
 
 class ChatsScreen extends StatelessWidget {
