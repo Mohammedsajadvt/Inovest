@@ -55,7 +55,7 @@ class EntrepreneurService {
    Future<List<CategoryModel>?> getCategory() async {
     final String url = "${ApiConstants.baseUrl}${ApiConstants.category}";
     final token = await SecureStorage().getToken();
-
+   print('Token here: $token end');
     try {
       final response = await _makeRequest(url, "GET", token: token);
       if (response != null && response.statusCode == 200) {

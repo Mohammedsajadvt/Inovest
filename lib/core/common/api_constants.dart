@@ -7,4 +7,5 @@ class ApiConstants {
   static const String refreshToken = "/auth/refresh-token";
   static const String profile = "/profile";
   static const String investorCategories = "/investor/categories";
+  static const String topIdeas = "/investor/ideas/top";
 }

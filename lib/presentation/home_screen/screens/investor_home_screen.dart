@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
@@ -28,8 +29,14 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
     super.dispose();
   }
 
+  final token = SecureStorage().getToken();
+
+
   @override
   Widget build(BuildContext context) {
+  token.then((value) {
+    print(value);
+  },);
     return Scaffold(
       backgroundColor: AppArray().colors[1],
       appBar: AppBar(

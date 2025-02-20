@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/business_logics/category/category_bloc.dart';
 import 'package:inovest/business_logics/category/category_event.dart';
 import 'package:inovest/business_logics/category/category_state.dart';
+import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
@@ -20,6 +23,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
   void initState() {
     super.initState();
     context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
+    context.read<ProfileBloc>().add(GetProfile());
   }
 
   @override
@@ -58,15 +62,26 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                   ImageAssets.logoWhite,
                   height: 100.r,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(right: 10.r),
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: CircleAvatar(
-                      backgroundColor: AppArray().colors[1],
-                    ),
-                  ),
-                ),
+                BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                  if (state is GetProfileloaded) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 10.r),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          backgroundColor: AppArray().colors[1],
+                          child: state.profileModel.data.imageUrl != null
+                              ? Image.network(state.profileModel.data.imageUrl!)
+                              : Icon(Icons.person, color: AppArray().colors[1]),
+                        ),
+                      ),
+                    );
+                  } else if (state is ProfileError) {
+                    log(state.message);
+                  }
+                  return const SizedBox.shrink();
+                })
               ],
             ),
             TextField(
@@ -91,7 +106,9 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
               ),
               onChanged: (value) {
-                context.read<GetCategoriesBloc>().add(SearchCategoriesEvent(query: value));
+                context
+                    .read<GetCategoriesBloc>()
+                    .add(SearchCategoriesEvent(query: value));
               },
             ),
           ],
@@ -126,11 +143,14 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                 children: [
                   Text(
                     'My Projects',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                   ),
                   PopupMenuButton<bool>(
                     onSelected: (ascending) {
-                      context.read<GetCategoriesBloc>().add(SortCategoriesEvent(ascending));
+                      context
+                          .read<GetCategoriesBloc>()
+                          .add(SortCategoriesEvent(ascending));
                     },
                     itemBuilder: (context) => [
                       PopupMenuItem(
@@ -146,7 +166,8 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                       children: [
                         Text(
                           'Sort by',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12.sp),
                         ),
                         Icon(Icons.filter_alt),
                       ],
@@ -179,11 +200,13 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       category.name,
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     const Text('Rating: 5⭐'),
                                   ],

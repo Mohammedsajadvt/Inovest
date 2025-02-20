@@ -2,9 +2,13 @@ import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/category/category_bloc.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/business_logics/ideas/ideas_bloc.dart';
+import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
+import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/data/services/auth_service.dart';
 import 'package:inovest/data/services/entrepreneur_service.dart';
+import 'package:inovest/data/services/investor_service.dart';
+import 'package:inovest/data/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/core/utils/index.dart';
 
@@ -13,6 +17,8 @@ Future<void> main() async {
   await SharedPreferences.getInstance();
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
+  final ProfileService profileService = ProfileService();
+  final InvestorService investorService = InvestorService();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -27,6 +33,12 @@ Future<void> main() async {
         ),
         BlocProvider(
           create: (context) => GetCategoriesBloc(entrepreneurService),
+        ),
+        BlocProvider(
+          create: (context) => ProfileBloc(profileService),
+        ),
+        BlocProvider(
+          create: (context) => InvestorIdeasBloc(investorService),
         ),
       ],
       child: MyApp(),
