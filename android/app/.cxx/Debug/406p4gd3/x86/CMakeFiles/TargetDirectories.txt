@@ -1,0 +1,2 @@
+C:/Users/DELL/Documents/inovest/android/app/.cxx/Debug/406p4gd3/x86/CMakeFiles/edit_cache.dir
+C:/Users/DELL/Documents/inovest/android/app/.cxx/Debug/406p4gd3/x86/CMakeFiles/rebuild_cache.dir

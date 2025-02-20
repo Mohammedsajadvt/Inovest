@@ -22,6 +22,7 @@ class ProfileModel {
 class UserData {
   final String id;
   final String name;
+  final String fullName;
   final String email;
   final String? passwordHash;
   final String? imageUrl;
@@ -30,11 +31,13 @@ class UserData {
   final String createdAt;
   final String updatedAt;
   final UserRole role;
+  final String? phoneNumber;
 
   UserData({
     required this.id,
     required this.name,
     required this.email,
+    required this.fullName,
     this.passwordHash,
     this.imageUrl,
     this.fcmToken,
@@ -42,12 +45,44 @@ class UserData {
     required this.createdAt,
     required this.updatedAt,
     required this.role,
+    required this.phoneNumber,
   });
+
+  UserData copyWith({
+    String? id,
+    String? name,
+    String? fullName,
+    String? email,
+    String? passwordHash,
+    String? imageUrl,
+    String? fcmToken,
+    String? lastSeen,
+    String? createdAt,
+    String? updatedAt,
+    UserRole? role,
+    String? phoneNumber,
+  }) {
+    return UserData(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
+      passwordHash: passwordHash ?? this.passwordHash,
+      imageUrl: imageUrl ?? this.imageUrl,
+      fcmToken: fcmToken ?? this.fcmToken,
+      lastSeen: lastSeen ?? this.lastSeen,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      role: role ?? this.role,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+    );
+  }
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
+      fullName: json['fullName'] ?? 'N/A',
       email: json['email'] ?? '',
       passwordHash: json['passwordHash'],
       imageUrl: json['imageUrl'],
@@ -56,6 +91,7 @@ class UserData {
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
       role: UserRole.fromJson(json['role'] ?? {}),
+      phoneNumber: json['phoneNumber'] ?? "N/A",
     );
   }
 
@@ -63,6 +99,7 @@ class UserData {
     return {
       'id': id,
       'name': name,
+      'fullName': fullName,
       'email': email,
       'passwordHash': passwordHash,
       'imageUrl': imageUrl,
@@ -71,6 +108,7 @@ class UserData {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'role': role.toJson(),
+      'phoneNumber': phoneNumber,
     };
   }
 }

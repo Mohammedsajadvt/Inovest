@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/api_constants.dart';
+import 'package:inovest/core/common/app_array.dart';
+import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/data/models/auth_model.dart';
 
 class AuthService {
@@ -38,12 +40,8 @@ class AuthService {
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "name": name,
-          "email": email,
-          "password": password,
-          "role": role
-        }),
+        body: jsonEncode(
+            {"name": name, "email": email, "password": password, "role": role}),
       );
 
       if (response.statusCode == 201) {
@@ -67,7 +65,12 @@ class AuthService {
     try {
       String? refreshToken = await SecureStorage().getToken();
       if (refreshToken == null || refreshToken.isEmpty) {
-        print("❌ No refresh token available.");
+        SnackBar(
+            backgroundColor: Colors.white,
+            content: Text(
+              'Session Expired Please log in again.',
+              style: TextStyle(color: AppArray().colors[1]),
+            ));
         return null;
       }
 
@@ -81,7 +84,7 @@ class AuthService {
         final jsonData = jsonDecode(response.body);
         if (jsonData.containsKey('tokens')) {
           await SecureStorage().saveToken(jsonData['tokens']['accessToken']);
-          return AuthModel.fromJson(jsonData); // Success
+          return AuthModel.fromJson(jsonData);
         } else {
           print("❌ No tokens received from refresh-token API.");
           return null;

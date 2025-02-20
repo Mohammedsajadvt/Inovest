@@ -5,6 +5,7 @@ import 'package:inovest/core/common/app_array.dart';
 class EntrepreneurDrawer extends StatelessWidget {
   final String username;
   final String email;
+  final String imageUrl;
   final VoidCallback onHomeTap;
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
@@ -12,6 +13,7 @@ class EntrepreneurDrawer extends StatelessWidget {
   const EntrepreneurDrawer({
     super.key,
     required this.username,
+    required this.imageUrl,
     required this.email,
     required this.onHomeTap,
     required this.onProfileTap,
@@ -41,8 +43,7 @@ class EntrepreneurDrawer extends StatelessWidget {
                 accountEmail:
                     Text(email, style: TextStyle(color: AppArray().colors[3])),
                 currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.orange,
-                  child: Text(username[0], style: TextStyle(fontSize: 40)),
+                                   child: Image.network(imageUrl),
                 ),
               ),
             ),
@@ -67,7 +68,7 @@ class EntrepreneurDrawer extends StatelessWidget {
               ),
               title: Text('Settings',
                   style: TextStyle(color: AppArray().colors[3])),
-              onTap: onProfileTap,
+              onTap: onSettingsTap,
             ),
             Divider(
               color: AppArray().colors[3],
@@ -78,7 +79,7 @@ class EntrepreneurDrawer extends StatelessWidget {
                 Icons.help_outline_outlined,
                 color: AppArray().colors[5],
               ),
-              title: Text('Settings',
+              title: Text('Help & Feedback',
                   style: TextStyle(color: AppArray().colors[3])),
               onTap: onSettingsTap,
             ),
@@ -115,7 +116,8 @@ class EntrepreneurDrawer extends StatelessWidget {
                     TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
               onTap: () {},
-            ),
+            
+      ),
           ],
         ),
       ),

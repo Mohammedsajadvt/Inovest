@@ -68,7 +68,9 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                     return Padding(
                       padding: EdgeInsets.only(right: 10.r),
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).pushNamed('/profile');
+                        },
                         child: CircleAvatar(
                           backgroundColor: AppArray().colors[1],
                           child: state.profileModel.data.imageUrl != null
@@ -122,12 +124,22 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
         foregroundColor: AppArray().colors[4],
         child: Icon(Icons.add),
       ),
-      drawer: EntrepreneurDrawer(
-        username: "John",
-        email: "John@gmail.com",
-        onHomeTap: () {},
-        onProfileTap: () {},
-        onSettingsTap: () {},
+      drawer: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          if (state is GetProfileloaded) {
+            return EntrepreneurDrawer(
+              username: state.profileModel.data.name,
+              email: state.profileModel.data.email,
+              imageUrl: state.profileModel.data.imageUrl!,
+              onHomeTap: () {},
+              onProfileTap: () {},
+              onSettingsTap: () {
+                Navigator.of(context).pushNamed('/settings');
+              },
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -147,6 +159,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                   ),
                   PopupMenuButton<bool>(
+                    color: AppArray().colors[1],
                     onSelected: (ascending) {
                       context
                           .read<GetCategoriesBloc>()

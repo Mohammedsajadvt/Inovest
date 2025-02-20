@@ -82,17 +82,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  // Token Expired Handling
   Future<void> _onTokenExpired(TokenExpiredEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
-    // Attempt to refresh the token
     final refreshToken = await SecureStorage().getToken();
     if (refreshToken != null && refreshToken.isNotEmpty) {
       final newAuthModel = await authService.refreshToken();
 
       if (newAuthModel != null && newAuthModel.success) {
-        // Save the new access token
         final accessToken = newAuthModel.data?.tokens?.accessToken ?? "";
         final refreshToken = newAuthModel.data?.tokens?.refreshToken ?? "";
         final userRole = newAuthModel.data?.user?.role ?? "GUEST";

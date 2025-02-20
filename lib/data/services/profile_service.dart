@@ -76,19 +76,22 @@ class ProfileService {
     }
   }
 
-  Future<ProfileModel?> addProfile() async {
-    final String url = "${ApiConstants.baseUrl}${ApiConstants.ideas}";
-    final token = await SecureStorage().getToken();
+  Future<ProfileModel?> updateProfile(ProfileModel profile) async {
+  final String url = "${ApiConstants.baseUrl}${ApiConstants.profile}";
+  final token = await SecureStorage().getToken();
+  
+  final String body = jsonEncode(profile.toJson());
 
-    try {
-      final response = await _makeRequest(url, "PUT", token: token);
-      if (response != null && response.statusCode == 200) {
-        return ProfileModel.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception('Error: ${response?.statusCode} - ${response?.body}');
-      }
-    } catch (e) {
-      throw Exception('Failed to load profile: $e');
+  try {
+    final response = await _makeRequest(url, "PUT", body: body, token: token);
+    if (response != null && response.statusCode == 200) {
+      return ProfileModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Error: ${response?.statusCode} - ${response?.body}');
     }
+  } catch (e) {
+    throw Exception('Failed to update profile: $e');
   }
+}
+
 }

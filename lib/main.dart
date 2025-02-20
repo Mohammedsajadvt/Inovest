@@ -4,6 +4,7 @@ import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
 import 'package:inovest/business_logics/ideas/ideas_bloc.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
+import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/utils/app_routes.dart';
 import 'package:inovest/data/services/auth_service.dart';
 import 'package:inovest/data/services/entrepreneur_service.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           theme: ThemeData(
             fontFamily: "JosefinSans",
+            textSelectionTheme: TextSelectionThemeData(cursorColor: AppArray().colors[5])
           ),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',

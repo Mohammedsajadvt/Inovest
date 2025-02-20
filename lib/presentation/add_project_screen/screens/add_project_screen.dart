@@ -6,6 +6,7 @@ import 'package:inovest/business_logics/category/category_bloc.dart';
 import 'package:inovest/business_logics/ideas/ideas_bloc.dart';
 import 'package:inovest/business_logics/category/category_event.dart';
 import 'package:inovest/business_logics/category/category_state.dart';
+import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/data/models/category_model.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/utils/index.dart';
@@ -48,7 +49,23 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20.r),
-            child: CircleAvatar(radius: 23),
+            child: BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is GetProfileloaded) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/profile');
+                    },
+                    child: CircleAvatar(
+                      radius: 23,
+                      backgroundImage: NetworkImage(
+                          state.profileModel.data.imageUrl.toString()),
+                    ),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
           ),
         ],
       ),
@@ -96,8 +113,9 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                     builder: (context, state) {
                       if (state is GetCategoryLoading) {
                         return Center(child: CircularProgressIndicator());
-                      }else  if (state is GetCategoryLoaded) {
+                      } else if (state is GetCategoryLoaded) {
                         return DropdownButtonFormField<CategoryModel>(
+                          dropdownColor: AppArray().colors[1],
                           decoration: _inputDecoration('Select Industry'),
                           items: state.categories.map((CategoryModel category) {
                             return DropdownMenuItem<CategoryModel>(
@@ -151,7 +169,10 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                     ],
                   ),
                   SliderTheme(
-                    data: SliderThemeData(thumbColor: AppArray().colors[5],activeTrackColor:Colors.grey[200] ,inactiveTrackColor:AppArray().colors[5] ),
+                    data: SliderThemeData(
+                        thumbColor: AppArray().colors[5],
+                        activeTrackColor: Colors.grey[200],
+                        inactiveTrackColor: AppArray().colors[5]),
                     child: RangeSlider(
                       values: _currentRangeValues,
                       min: 100,
@@ -179,14 +200,16 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                         context.read<IdeasBloc>().add(
                                               CreateIdeas(
                                                 title: _titleController.text,
-                                                abstract: _abstractController.text,
+                                                abstract:
+                                                    _abstractController.text,
                                                 expectedInvestment:
                                                     _currentRangeValues.end
                                                         .toDouble(),
-                                                categoryId: selectedCategory!.id,
+                                                categoryId:
+                                                    selectedCategory!.id,
                                               ),
                                             );
-                                            Navigator.pop(context);
+                                        Navigator.pop(context);
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -199,12 +222,12 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                     }
                                   },
                             style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                                  AppArray().colors[2]),
-                              foregroundColor: WidgetStatePropertyAll(
-                                  AppArray().colors[1]),
+                              backgroundColor:
+                                  WidgetStatePropertyAll(AppArray().colors[2]),
+                              foregroundColor:
+                                  WidgetStatePropertyAll(AppArray().colors[1]),
                             ),
-                            child:Text('Submit'),
+                            child: Text('Submit'),
                           ),
                         ),
                       );

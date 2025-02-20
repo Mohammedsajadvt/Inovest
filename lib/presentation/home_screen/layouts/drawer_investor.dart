@@ -8,7 +8,7 @@ class InvestorDrawer extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
-
+  final String imageUrl;
   const InvestorDrawer({
     super.key,
     required this.username,
@@ -16,6 +16,7 @@ class InvestorDrawer extends StatelessWidget {
     required this.onHomeTap,
     required this.onProfileTap,
     required this.onSettingsTap,
+    required this.imageUrl
   });
 
   @override
@@ -41,8 +42,7 @@ class InvestorDrawer extends StatelessWidget {
                 accountEmail:
                     Text(email, style: TextStyle(color: AppArray().colors[3])),
                 currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.orange,
-                  child: Text(username[0], style: TextStyle(fontSize: 40)),
+                  child: Image.network(imageUrl),
                 ),
               ),
             ),
@@ -64,7 +64,7 @@ class InvestorDrawer extends StatelessWidget {
               ),
               title: Text('Settings',
                   style: TextStyle(color: AppArray().colors[3])),
-              onTap: onProfileTap,
+              onTap: onSettingsTap,
             ),
             Divider(
               color: AppArray().colors[3],
@@ -75,7 +75,7 @@ class InvestorDrawer extends StatelessWidget {
                 Icons.help_outline_outlined,
                 color: AppArray().colors[5],
               ),
-              title: Text('Settings',
+              title: Text('Help & Feedback',
                   style: TextStyle(color: AppArray().colors[3])),
               onTap: onSettingsTap,
             ),

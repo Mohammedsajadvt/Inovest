@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
+import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_investor.dart';
 
@@ -21,6 +25,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    context.read<ProfileBloc>().add(GetProfile());
   }
 
   @override
@@ -31,12 +36,13 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
 
   final token = SecureStorage().getToken();
 
-
   @override
   Widget build(BuildContext context) {
-  token.then((value) {
-    print(value);
-  },);
+    token.then(
+      (value) {
+        print(value);
+      },
+    );
     return Scaffold(
       backgroundColor: AppArray().colors[1],
       appBar: AppBar(
@@ -71,15 +77,28 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                   ImageAssets.logoWhite,
                   height: 100.r,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(right: 10.r),
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: CircleAvatar(
-                      backgroundColor: AppArray().colors[1],
-                    ),
-                  ),
-                ),
+                BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                  if (state is GetProfileloaded) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 10.r),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed('/profile');
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: AppArray().colors[1],
+                          child: state.profileModel.data.imageUrl != null
+                              ? Image.network(state.profileModel.data.imageUrl!)
+                              : Icon(Icons.person, color: AppArray().colors[1]),
+                        ),
+                      ),
+                    );
+                  } else if (state is ProfileError) {
+                    print(state.message);
+                  }
+                  return const SizedBox.shrink();
+                })
               ],
             ),
             TextField(
@@ -108,12 +127,22 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
           ],
         ),
       ),
-      drawer: InvestorDrawer(
-        username: "John",
-        email: "John@gmail.com",
-        onHomeTap: () {},
-        onProfileTap: () {},
-        onSettingsTap: () {},
+      drawer: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          if (state is GetProfileloaded) {
+            return InvestorDrawer(
+              username: state.profileModel.data.name,
+              email: state.profileModel.data.email,
+              imageUrl: state.profileModel.data.imageUrl!,
+              onHomeTap: () {},
+              onProfileTap: () {},
+              onSettingsTap: () {
+                Navigator.of(context).pushNamed('/settings');
+              },
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       body: Column(
         children: [
