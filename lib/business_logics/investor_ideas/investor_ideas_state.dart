@@ -17,6 +17,14 @@ class GetInvestorLoaded extends InvestorIdeasState {
   List<Object> get props => [topIdeas];
 }
 
+class InvestorCategoriesLoaded extends InvestorIdeasState{
+  final InvestorCategories investorCategories;
+  const InvestorCategoriesLoaded(this.investorCategories);
+  
+  @override
+  List<Object> get props => [investorCategories];
+}
+
 class GetInvestorIdeasLoading extends InvestorIdeasState{}
 
 class GetInvestorIdeasError extends InvestorIdeasState{

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/app_array.dart';
@@ -164,64 +165,68 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
           SizedBox(
             height: 10.h,
           ),
-          TabBar(
-            isScrollable: true,
-            padding: EdgeInsets.only(right: 40),
-            labelColor: AppArray().colors[1],
-            indicatorColor: AppArray().colors[1],
-            dividerColor: AppArray().colors[1],
-            controller: _tabController,
-            tabs: <Widget>[
-              Container(
-                width: 140.w,
-                padding: EdgeInsets.symmetric(horizontal: 10).r,
-                decoration: BoxDecoration(
-                  color: AppArray().colors[0],
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Tab(
-                  child: Text(
-                    'Tab 1',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: 140.w,
-                padding: EdgeInsets.symmetric(horizontal: 10).r,
-                decoration: BoxDecoration(
-                  color: AppArray().colors[1],
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: AppArray().colors[0]),
-                ),
-                child: Tab(
-                  child: Text(
-                    'Tab 2',
-                    style: TextStyle(
-                      color: AppArray().colors[0],
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: 140.w,
-                padding: EdgeInsets.symmetric(horizontal: 10).r,
-                decoration: BoxDecoration(
-                  color: AppArray().colors[0],
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Tab(
-                  child: Text(
-                    'Tab 3',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
+            builder: (context, state) {
+              return TabBar(
+                      isScrollable: true,
+                      padding: EdgeInsets.only(right: 40),
+                      labelColor: AppArray().colors[1],
+                      indicatorColor: AppArray().colors[1],
+                      dividerColor: AppArray().colors[1],
+                      controller: _tabController,
+                      tabs: <Widget>[
+                        Container(
+                          width: 140.w,
+                          padding: EdgeInsets.symmetric(horizontal: 10).r,
+                          decoration: BoxDecoration(
+                            color: AppArray().colors[0],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Tab(
+                            child: Text(
+                              'Tab 1',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 140.w,
+                          padding: EdgeInsets.symmetric(horizontal: 10).r,
+                          decoration: BoxDecoration(
+                            color: AppArray().colors[1],
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: AppArray().colors[0]),
+                          ),
+                          child: Tab(
+                            child: Text(
+                              'Tab 2',
+                              style: TextStyle(
+                                color: AppArray().colors[0],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 140.w,
+                          padding: EdgeInsets.symmetric(horizontal: 10).r,
+                          decoration: BoxDecoration(
+                            color: AppArray().colors[0],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Tab(
+                            child: Text(
+                              'Tab 3',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+            },
           ),
           Expanded(
             child: TabBarView(

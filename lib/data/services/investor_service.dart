@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/api_constants.dart';
+import 'package:inovest/data/models/investor_categories.dart';
 import 'package:inovest/data/models/top_ideas_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
 
@@ -67,6 +68,21 @@ class InvestorService {
       final response = await _makeRequest(url, "GET",);
       if (response != null && response.statusCode == 200) {
         return TopIdeas.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Error: ${response?.statusCode} - ${response?.body}');
+      }
+    } catch (e) {
+      throw Exception('Failed to create ideas: $e');
+    }
+  }
+
+  Future<InvestorCategories?> investorCategories() async {
+    final url = "${ApiConstants.baseUrl}${ApiConstants.investorCategories}";
+    final token = SecureStorage().getToken();
+    try {
+      final response = await _makeRequest(url, "GET",);
+      if (response != null && response.statusCode == 200) {
+        return InvestorCategories.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Error: ${response?.statusCode} - ${response?.body}');
       }

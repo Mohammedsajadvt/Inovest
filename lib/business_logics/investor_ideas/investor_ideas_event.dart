@@ -9,3 +9,5 @@ abstract class InvestorIdeasEvent extends Equatable {
 
 
 class GetInvestorIdeas extends InvestorIdeasEvent{}
+
+class GetInvestorCategories extends InvestorIdeasEvent{}
