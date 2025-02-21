@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:inovest/core/utils/index.dart';
+import 'package:inovest/data/models/categories_ideas.dart';
 import 'package:inovest/data/models/ideas_model.dart';
 import 'package:inovest/data/services/entrepreneur_service.dart';
 
@@ -38,5 +39,7 @@ class IdeasBloc extends Bloc<IdeasEvent, IdeasState> {
         emit(IdeasError("An error occurred: $e"));
       }
     });
+    
+
   }
 }

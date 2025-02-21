@@ -1,36 +1,55 @@
-part of 'investor_ideas_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:inovest/data/models/categories_ideas.dart';
+import 'package:inovest/data/models/investor_categories.dart';
+import 'package:inovest/data/models/top_ideas_model.dart'; 
 
-sealed class InvestorIdeasState extends Equatable {
+abstract class InvestorIdeasState extends Equatable {
   const InvestorIdeasState();
 
   @override
   List<Object> get props => [];
 }
 
-final class InvestorIdeasInitial extends InvestorIdeasState {}
+class InvestorIdeasInitial extends InvestorIdeasState {}
 
-class GetInvestorLoaded extends InvestorIdeasState {
-  final TopIdeas topIdeas;
-  const GetInvestorLoaded(this.topIdeas);
+class InvestorIdeasLoading extends InvestorIdeasState {}
+
+class InvestorIdeasLoaded extends InvestorIdeasState {
+  final TopIdeas? topIdeas;
+  final InvestorCategories? investorCategories;
+
+  const InvestorIdeasLoaded({this.topIdeas, this.investorCategories});
+
+  InvestorIdeasLoaded copyWith({
+    TopIdeas? topIdeas,
+    InvestorCategories? investorCategories,
+  }) {
+    return InvestorIdeasLoaded(
+      topIdeas: topIdeas ?? this.topIdeas,
+      investorCategories: investorCategories ?? this.investorCategories,
+    );
+  }
 
   @override
-  List<Object> get props => [topIdeas];
+  List<Object> get props => [topIdeas ?? '', investorCategories ?? ''];
 }
 
-class InvestorCategoriesLoaded extends InvestorIdeasState{
-  final InvestorCategories investorCategories;
-  const InvestorCategoriesLoaded(this.investorCategories);
-  
-  @override
-  List<Object> get props => [investorCategories];
-}
-
-class GetInvestorIdeasLoading extends InvestorIdeasState{}
-
-class GetInvestorIdeasError extends InvestorIdeasState{
+class InvestorIdeasError extends InvestorIdeasState {
   final String message;
-  const GetInvestorIdeasError(this.message);
-  
+
+  const InvestorIdeasError(this.message);
+
   @override
   List<Object> get props => [message];
 }
+class GetCategoriesBasedIdeasLoaded extends InvestorIdeasState {
+  final dynamic ideas; // Adjust this to your actual model (e.g., InvestorCategories)
+  final String? categoryName;
+
+  const GetCategoriesBasedIdeasLoaded(this.ideas, {this.categoryName});
+
+  @override
+  List<Object> get props => [ideas, categoryName!];
+}
+
+// Ensure other states (InvestorIdeasLoading, InvestorIdeasError, etc.) are defined as needed

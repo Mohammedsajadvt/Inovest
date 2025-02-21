@@ -24,6 +24,7 @@ class GetIdeasLodaing extends IdeasState{
   const GetIdeasLodaing(this.ideas);
 }
 
+
 class IdeasError extends IdeasState{
   final String error;
   const IdeasError(this.error);

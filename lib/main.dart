@@ -59,9 +59,9 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           theme: ThemeData(
-            fontFamily: "JosefinSans",
-            textSelectionTheme: TextSelectionThemeData(cursorColor: AppArray().colors[5])
-          ),
+              fontFamily: "JosefinSans",
+              textSelectionTheme:
+                  TextSelectionThemeData(cursorColor: AppArray().colors[5])),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           initialRoute: AppRoutes.splash,

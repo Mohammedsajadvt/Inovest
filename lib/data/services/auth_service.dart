@@ -71,7 +71,7 @@ class AuthService {
               'Session Expired Please log in again.',
               style: TextStyle(color: AppArray().colors[1]),
             ));
-        return null;
+        
       }
 
       final response = await http.post(
