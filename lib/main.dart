@@ -12,10 +12,15 @@ import 'package:inovest/data/services/investor_service.dart';
 import 'package:inovest/data/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/core/utils/index.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
