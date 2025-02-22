@@ -8,4 +8,5 @@ class ApiConstants {
   static const String profile = "/profile";
   static const String investorCategories = "/investor/categories";
   static const String topIdeas = "/investor/ideas/top";
+  static const String googleLogin = "/auth/google-login";
 }

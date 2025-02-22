@@ -3,9 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/custom_button.dart';
+import 'package:inovest/data/services/google_auth_service.dart';
 
 class LandingScreen extends StatelessWidget {
-  const LandingScreen({super.key});
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
+
+  LandingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +28,46 @@ class LandingScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 30.r, right: 30.r),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () async {
+                  final authModel = await _googleAuthService.signInWithGoogle();
+                  if (authModel != null && authModel.success) {
+                    if (authModel.data?.user.role == "INVESTOR") {
+                      Navigator.pushReplacementNamed(context, '/investorHome');
+                    } else if (authModel.data?.user.role == "ENTREPRENEUR") {
+                      Navigator.pushReplacementNamed(context, '/entrepreneurHome');
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(authModel?.message ?? 'Google sign in failed'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
                 child: Container(
                   width: double.infinity,
                   height: 50.h,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(80),
-                      border: Border.all(color: Colors.black)),
-                  child: Center(
-                    child: Text(
-                      'continue with google',
-                      style: TextStyle(
-                          fontSize: 16.sp, fontWeight: FontWeight.bold),
-                    ),
+                    borderRadius: BorderRadius.circular(80),
+                    border: Border.all(color: Colors.black),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/google_logo.png',
+                        height: 24.h,
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        'Continue with Google',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

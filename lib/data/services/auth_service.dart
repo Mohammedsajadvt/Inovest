@@ -98,4 +98,34 @@ class AuthService {
       return null;
     }
   }
+
+  Future<AuthModel?> googleLogin(
+      {required String email, required String name, required String googleId}) async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.googleLogin}";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email,
+          "name": name,
+          "googleId": googleId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return AuthModel.fromJson(jsonDecode(response.body));
+      } else {
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: responseBody['success'] ?? false,
+          message: responseBody['message'] ?? 'Unknown error',
+        );
+      }
+    } catch (e) {
+      print('Google login failed: $e');
+      return AuthModel(success: false, message: 'An error occurred: $e');
+    }
+  }
 }
