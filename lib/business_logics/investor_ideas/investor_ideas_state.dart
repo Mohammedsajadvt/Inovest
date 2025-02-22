@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:inovest/data/models/categories_ideas.dart';
 import 'package:inovest/data/models/investor_categories.dart';
-import 'package:inovest/data/models/top_ideas_model.dart'; 
+import 'package:inovest/data/models/top_ideas_model.dart';
 
 abstract class InvestorIdeasState extends Equatable {
   const InvestorIdeasState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class InvestorIdeasInitial extends InvestorIdeasState {}
@@ -31,7 +31,7 @@ class InvestorIdeasLoaded extends InvestorIdeasState {
   }
 
   @override
-  List<Object> get props => [topIdeas ?? '', investorCategories ?? ''];
+  List<Object?> get props => [topIdeas, investorCategories];
 }
 
 class InvestorIdeasError extends InvestorIdeasState {
@@ -40,16 +40,15 @@ class InvestorIdeasError extends InvestorIdeasState {
   const InvestorIdeasError(this.message);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message];
 }
+
 class GetCategoriesBasedIdeasLoaded extends InvestorIdeasState {
-  final dynamic ideas; // Adjust this to your actual model (e.g., InvestorCategories)
+  final CategoriesIdeas ideas;
   final String? categoryName;
 
   const GetCategoriesBasedIdeasLoaded(this.ideas, {this.categoryName});
 
   @override
-  List<Object> get props => [ideas, categoryName!];
+  List<Object?> get props => [ideas, categoryName];
 }
-
-// Ensure other states (InvestorIdeasLoading, InvestorIdeasError, etc.) are defined as needed

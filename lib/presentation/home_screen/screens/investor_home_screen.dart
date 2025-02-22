@@ -6,7 +6,6 @@ import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart'
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/index.dart';
@@ -22,43 +21,43 @@ class InvestorHomeScreen extends StatefulWidget {
 
 class _InvestorHomeScreenState extends State<InvestorHomeScreen>
     with SingleTickerProviderStateMixin {
-  Timer? _autoRefreshTimer;
-
   @override
   void initState() {
     super.initState();
     print("Initializing InvestorHomeScreen...");
-    _refreshData();
-    _startAutoRefresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   @override
   void dispose() {
-    _autoRefreshTimer?.cancel(); // Cancel timer when widget is disposed
     super.dispose();
   }
 
-  Future<void> _refreshData() async {
-    final token = await SecureStorage().getToken();
-    print("Token retrieved: $token");
-    if (token != null) {
-      context.read<ProfileBloc>().add(GetProfile());
-      context.read<InvestorIdeasBloc>().add(GetInvestorIdeas());
-      context.read<InvestorIdeasBloc>().add(GetInvestorCategories());
-    } else {
-      print("No token found, redirecting to login...");
-      Navigator.of(context).pushReplacementNamed('/login');
-    }
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> _loadData() async {
+    print("Loading data in InvestorHomeScreen...");
+    context.read<ProfileBloc>().add(GetProfile());
+    context.read<InvestorIdeasBloc>().add(GetInvestorIdeas());
+    context.read<InvestorIdeasBloc>().add(GetInvestorCategories());
   }
 
-  void _startAutoRefresh() {
-    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (mounted) {
-        print("Auto-refreshing data...");
-        _refreshData();
-      }
-    });
+  // Handle navigation back from IdeasScreen
+  void _navigateToIdeasScreen(String categoryId, String categoryName) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => IdeasScreen(
+          title: categoryName,
+          categoryId: categoryId,
+        ),
+      ),
+    );
+
+    // If IdeasScreen returns a signal to refresh (e.g., true), reload data
+    if (result == true) {
+      print("Returned from IdeasScreen, triggering refresh...");
+      _loadData();
+    }
   }
 
   @override
@@ -99,31 +98,52 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     ImageAssets.logoWhite,
                     height: 100.r,
                   ),
-                  BlocBuilder<ProfileBloc, ProfileState>(
-                    builder: (context, state) {
-                      if (state is GetProfileloaded) {
-                        return Padding(
-                          padding: EdgeInsets.only(right: 10.r),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushNamed('/profile');
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: AppArray().colors[1],
-                              child: state.profileModel.data.imageUrl != null
-                                  ? Image.network(
-                                      state.profileModel.data.imageUrl!)
-                                  : Icon(Icons.person,
-                                      color: AppArray().colors[1]),
-                            ),
-                          ),
-                        );
-                      } else if (state is ProfileError) {
-                        print("Profile Error: ${state.message}");
+                 BlocBuilder<ProfileBloc, ProfileState>(
+  builder: (context, state) {
+    if (state is GetProfileloaded) {
+      return Padding(
+        padding: EdgeInsets.only(right: 10.r),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed('/profile');
+          },
+          child: CircleAvatar(
+            backgroundColor: AppArray().colors[1],
+            child: state.profileModel.data.imageUrl != null
+                ? Image.network(
+                    state.profileModel.data.imageUrl!,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child; 
                       }
-                      return const SizedBox.shrink();
+                      return Icon(
+                        Icons.person,
+                        color: AppArray().colors[1],
+                      ); 
                     },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.person,
+                        color: AppArray().colors[1],
+                      ); 
+                    },
+                  )
+                : Icon(
+                    Icons.person,
+                    color: AppArray().colors[1],
                   ),
+          ),
+        ),
+      );
+    } else if (state is ProfileError) {
+      print("Profile Error: ${state.message}");
+    }
+    return Padding(
+        padding: EdgeInsets.only(right: 10.r),
+      child: CircleAvatar(backgroundColor: AppArray().colors[1],),
+    );
+  },
+),
                 ],
               ),
               TextField(
@@ -132,10 +152,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                   filled: true,
                   hintText: 'Search',
                   hintStyle: TextStyle(color: AppArray().colors[3]),
-                  suffixIcon: Icon(
-                    Icons.search,
-                    color: AppArray().colors[3],
-                  ),
+                  suffixIcon: Icon(Icons.search, color: AppArray().colors[3]),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(60),
                     borderSide: const BorderSide(color: Colors.transparent),
@@ -144,8 +161,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     borderRadius: BorderRadius.circular(60),
                     borderSide: const BorderSide(color: Colors.transparent),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+                  contentPadding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
                 ),
                 onChanged: (value) {},
               ),
@@ -173,26 +189,22 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
       body: BlocListener<InvestorIdeasBloc, InvestorIdeasState>(
         listener: (context, state) {
           if (state is GetCategoriesBasedIdeasLoaded) {
-            Navigator.pop(context); // Close the loading dialog
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => IdeasScreen(
-                  title: state.categoryName ?? 'Ideas',
-                  categoryId: state.ideas.data.isNotEmpty
-                      ? state.ideas.data[0].categoryId
-                      : '', // Use the categoryId from the first idea
-                ),
-              ),
+            Navigator.pop(context); // Close loading dialog
+            _navigateToIdeasScreen(
+              state.ideas.data != null && state.ideas.data!.isNotEmpty
+                  ? state.ideas.data![0].categoryId
+                  : '',
+              state.categoryName ?? 'Ideas',
             );
           } else if (state is InvestorIdeasError) {
-            Navigator.pop(context); // Close the loading dialog
+            Navigator.pop(context); // Close loading dialog if open
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error: ${state.message}')),
             );
           }
         },
         child: RefreshIndicator(
-          onRefresh: _refreshData, // Manual pull-to-refresh
+          onRefresh: _loadData,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -204,8 +216,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     children: [
                       Text(
                         'Explore',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20.sp),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
                       ),
                     ],
                   ),
@@ -214,19 +225,11 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                 BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
                   builder: (context, state) {
                     print("InvestorIdeasBloc State: $state");
-                    if (state is InvestorIdeasLoading) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: AppArray().colors[0],
-                        ),
-                      );
-                    } else if (state is InvestorIdeasLoaded) {
+                    if (state is InvestorIdeasLoaded) {
                       final categories = state.investorCategories;
                       if (categories == null || categories.data.isEmpty) {
-                        return const Center(
-                            child: Text('No categories available'));
+                        return const Center(child: Text('No categories available'));
                       }
-
                       return SizedBox(
                         height: 50.h,
                         child: ListView.builder(
@@ -236,21 +239,15 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                           itemBuilder: (context, index) {
                             bool isFirstItem = index == 0;
                             int patternIndex = index < 2 ? 1 : (index - 2) % 2;
-
-                            Color bgColor;
-                            Color textColor;
-                            Border? border;
-
-                            if (isFirstItem || patternIndex == 0) {
-                              bgColor = AppArray().colors[0];
-                              textColor = AppArray().colors[1];
-                              border = null;
-                            } else {
-                              bgColor = AppArray().colors[1];
-                              textColor = AppArray().colors[0];
-                              border = Border.all(
-                                  color: AppArray().colors[0], width: 2.w);
-                            }
+                            Color bgColor = isFirstItem || patternIndex == 0
+                                ? AppArray().colors[0]
+                                : AppArray().colors[1];
+                            Color textColor = isFirstItem || patternIndex == 0
+                                ? AppArray().colors[1]
+                                : AppArray().colors[0];
+                            Border? border = isFirstItem || patternIndex == 0
+                                ? null
+                                : Border.all(color: AppArray().colors[0], width: 2.w);
 
                             return GestureDetector(
                               onTap: () {
@@ -258,8 +255,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (context) => Center(
-                                    child: CircularProgressIndicator(
-                                        color: AppArray().colors[0]),
+                                    child: CircularProgressIndicator(color: AppArray().colors[0]),
                                   ),
                                 );
                                 context.read<InvestorIdeasBloc>().add(
@@ -281,10 +277,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 child: Center(
                                   child: Text(
                                     categories.data[index].name.toUpperCase(),
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 16.sp,
-                                    ),
+                                    style: TextStyle(color: textColor, fontSize: 16.sp),
                                   ),
                                 ),
                               ),
@@ -293,9 +286,23 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                         ),
                       );
                     } else if (state is InvestorIdeasError) {
-                      return Center(child: Text('Error: ${state.message}'));
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(child: Text('Error: ${state.message}')),
+                          SizedBox(height: 20.h),
+                          ElevatedButton(
+                            onPressed: _loadData,
+                            child: const Text('Retry'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppArray().colors[0],
+                              foregroundColor: AppArray().colors[1],
+                            ),
+                          ),
+                        ],
+                      );
                     }
-                    return const Center(child: Text('Pull to refresh'));
+                    return SizedBox.shrink();
                   },
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.5),
