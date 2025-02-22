@@ -14,6 +14,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '/core/utils/index.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:inovest/data/services/notification_service.dart';
+import 'package:inovest/data/services/firebase_messaging_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +24,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
