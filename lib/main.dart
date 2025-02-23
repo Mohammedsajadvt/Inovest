@@ -21,7 +21,6 @@ import 'package:inovest/data/services/firebase_messaging_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
 
-// Flag to track if Firebase has been initialized
 bool _isFirebaseInitialized = false;
 
 Future<void> initializeFirebase() async {
@@ -34,14 +33,12 @@ Future<void> initializeFirebase() async {
       } else if (Platform.isIOS) {
         await Firebase.initializeApp();
       }
-      _isFirebaseInitialized = true; // Mark as initialized
+      _isFirebaseInitialized = true; 
     } catch (e) {
-      // Handle any initialization errors (e.g., already initialized)
       if (e.toString().contains('duplicate-app')) {
-        // Firebase is already initialized; proceed safely
         _isFirebaseInitialized = true;
       } else {
-        rethrow; // Rethrow other unexpected errors
+        rethrow; 
       }
     }
   }
