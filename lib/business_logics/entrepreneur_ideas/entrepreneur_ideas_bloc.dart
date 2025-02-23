@@ -1,8 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:inovest/data/models/entrepreneur_ideas_model.dart';
 import 'package:inovest/data/services/entrepreneur_service.dart';
-
+import 'package:equatable/equatable.dart';
 part 'entrepreneur_ideas_event.dart';
 part 'entrepreneur_ideas_state.dart';
 

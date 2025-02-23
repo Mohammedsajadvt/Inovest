@@ -9,6 +9,7 @@ abstract class EntrepreneurIdeasEvent extends Equatable {
 
 class GetEntrepreneurIdeas extends EntrepreneurIdeasEvent {}
 
+
 class SortEntrepreneurIdeas extends EntrepreneurIdeasEvent {
   final bool ascending;
 

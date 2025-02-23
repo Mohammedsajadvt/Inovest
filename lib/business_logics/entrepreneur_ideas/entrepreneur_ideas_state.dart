@@ -26,9 +26,9 @@ class EntrepreneurIdeasLoaded extends EntrepreneurIdeasState {
 
 class EntrepreneurIdeasError extends EntrepreneurIdeasState {
   final String message;
-
+  
   const EntrepreneurIdeasError(this.message);
-
+  
   @override
   List<Object> get props => [message];
 }

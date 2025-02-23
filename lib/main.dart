@@ -58,13 +58,12 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   final notificationService = NotificationService();
-  await notificationService.initialize();
+  notificationService.initialize();
 
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
   final InvestorService investorService = InvestorService();
-
   runApp(
     MultiBlocProvider(
       providers: [
