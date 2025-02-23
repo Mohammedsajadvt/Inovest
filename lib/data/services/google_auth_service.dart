@@ -13,13 +13,13 @@ class GoogleAuthService {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
-
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       
       final credential = firebase.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+
 
       final firebase.UserCredential authResult = 
           await _auth.signInWithCredential(credential);

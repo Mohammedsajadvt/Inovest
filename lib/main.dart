@@ -18,7 +18,6 @@ import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:inovest/data/services/notification_service.dart';
 import 'package:inovest/data/services/firebase_messaging_handler.dart';
-import 'package:flutter/material.dart';
 import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
 
 bool _isFirebaseInitialized = false;
@@ -93,6 +92,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           theme: ThemeData(
+            scaffoldBackgroundColor: AppArray().colors[1],
             fontFamily: "JosefinSans",
             textSelectionTheme: TextSelectionThemeData(
               cursorColor: AppArray().colors[5],

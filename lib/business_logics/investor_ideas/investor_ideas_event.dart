@@ -15,7 +15,7 @@ class CategoriesIdeas extends InvestorIdeasEvent {
   final String categoryId;
   final String? categoryName;
 
-  const CategoriesIdeas(this.categoryId, {this.categoryName});
+  const CategoriesIdeas({required this.categoryId, this.categoryName});
 
   @override
   List<Object?> get props => [categoryId, categoryName];

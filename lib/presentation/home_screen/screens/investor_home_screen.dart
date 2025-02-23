@@ -268,7 +268,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 );
                                 context.read<InvestorIdeasBloc>().add(
                                       CategoriesIdeas(
-                                        categories.data[index].id,
+                                        categoryId:categories.data[index].id,
                                         categoryName:
                                             categories.data[index].name,
                                       ),

@@ -121,8 +121,9 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppArray().colors[1],
         onPressed: () => Navigator.pushNamed(context, '/project'),
-        child: const Icon(Icons.add),
+        child:  Icon(Icons.add,color: AppArray().colors[5],),
       ),
       drawer: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
@@ -142,6 +143,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
         },
       ),
       body: RefreshIndicator(
+        color: AppArray().colors[5],
         onRefresh: () async => _loadData(),
         child: Column(
           children: [
@@ -198,6 +200,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                       itemBuilder: (context, index) {
                         final idea = state.displayedIdeas[index];
                         return Card(
+                          color: Color(0xffFCFCFE),
                           margin: EdgeInsets.symmetric(
                               horizontal: 16.w, vertical: 8.h),
                           child: ListTile(

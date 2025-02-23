@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/core/common/app_array.dart';
