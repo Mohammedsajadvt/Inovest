@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "565236548413",
+    "project_id": "inovest-ea78c",
+    "storage_bucket": "inovest-ea78c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565236548413:android:eaa5a03663eb44de763b54",
+        "android_client_info": {
+          "package_name": "com.inovestsolutions.inovest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm6vw1aadCNqoZUjOKG-Y4W3rURDQWQzw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
