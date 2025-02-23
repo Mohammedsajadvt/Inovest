@@ -5,13 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:inovest/data/models/category_model.dart';
 import 'package:inovest/data/models/ideas_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
+import 'package:inovest/data/models/entrepreneur_ideas_model.dart';
 
 class EntrepreneurService {
   final AuthService _authService = AuthService();
 
   Future<IdeasModel?> createIdeas(String title, String abstract,
       double expectedInvestment, String categoryId) async {
-    final String url = "${ApiConstants.baseUrl}${ApiConstants.ideas}";
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.entrepreneurIdeas}";
     final token = await SecureStorage().getToken();
     try {
       final response = await _makeRequest(
@@ -38,7 +39,7 @@ class EntrepreneurService {
   }
 
   Future<IdeasModel?> getIdeas() async {
-    final String url = "${ApiConstants.baseUrl}${ApiConstants.ideas}";
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.entrepreneurIdeas}";
     final token = await SecureStorage().getToken();
     try {
       final response = await _makeRequest(url, "GET", token: token);
@@ -68,6 +69,29 @@ class EntrepreneurService {
       }
     } catch (e) {
       print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<EntrepreneurIdeasModel?> getEntrepreneurIdeas() async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.entrepreneurIdeas}";
+    final token = await SecureStorage().getToken();
+
+    try {
+      final response = await _makeRequest(url, "GET", token: token);
+      
+      if (response != null && response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return EntrepreneurIdeasModel.fromJson({
+          'success': true,
+          'data': responseData['data'],
+        });
+      } else {
+        print('Failed to load ideas: ${response?.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading ideas: $e');
       return null;
     }
   }

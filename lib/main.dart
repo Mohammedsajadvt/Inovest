@@ -17,6 +17,8 @@ import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:inovest/data/services/notification_service.dart';
 import 'package:inovest/data/services/firebase_messaging_handler.dart';
+import 'package:flutter/material.dart';
+import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,6 +56,11 @@ Future<void> main() async {
         ),
         BlocProvider(
           create: (context) => InvestorIdeasBloc(investorService),
+        ),
+        BlocProvider<EntrepreneurIdeasBloc>(
+          create: (context) => EntrepreneurIdeasBloc(
+            entrepreneurService: EntrepreneurService(),
+          ),
         ),
       ],
       child: MyApp(),

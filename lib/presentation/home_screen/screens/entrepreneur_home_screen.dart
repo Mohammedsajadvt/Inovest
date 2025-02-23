@@ -5,14 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/business_logics/category/category_bloc.dart';
 import 'package:inovest/business_logics/category/category_event.dart';
-import 'package:inovest/business_logics/category/category_state.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
+import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
 
 class EntrepreneurHomeScreen extends StatefulWidget {
-  const EntrepreneurHomeScreen({super.key});
+  const EntrepreneurHomeScreen({Key? key}) : super(key: key);
 
   @override
   State<EntrepreneurHomeScreen> createState() => _EntrepreneurHomeScreenState();
@@ -22,8 +22,11 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
-    context.read<ProfileBloc>().add(GetProfile());
+    _loadData();
+  }
+
+  void _loadData() {
+    context.read<EntrepreneurIdeasBloc>().add(GetEntrepreneurIdeas());
   }
 
   @override
@@ -117,12 +120,8 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/project');
-        },
-        backgroundColor: AppArray().colors[1],
-        foregroundColor: AppArray().colors[4],
-        child: Icon(Icons.add),
+        onPressed: () => Navigator.pushNamed(context, '/project'),
+        child: const Icon(Icons.add),
       ),
       drawer: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
@@ -142,9 +141,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
         },
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
-        },
+        onRefresh: () async => _loadData(),
         child: Column(
           children: [
             SizedBox(height: 10.h),
@@ -189,55 +186,64 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 5),
             Expanded(
-              child: BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
+              child: BlocBuilder<EntrepreneurIdeasBloc, EntrepreneurIdeasState>(
                 builder: (context, state) {
-                  if (state is GetCategoryLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (state is GetCategoryLoaded) {
+                  if (state is EntrepreneurIdeasLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is EntrepreneurIdeasLoaded) {
                     return ListView.builder(
-                      itemCount: state.categories.length,
+                      itemCount: state.ideas.data.length,
                       itemBuilder: (context, index) {
-                        final category = state.categories[index];
+                        final idea = state.ideas.data[index];
                         return Card(
-                          shape: Border.all(color: const Color(0xffFCFCFE)),
-                          color: const Color(0xffFCFCFE),
-                          elevation: 2,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.h, horizontal: 10.w),
-                            child: Column(
+                          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                          child: ListTile(
+                            title: Text(
+                              idea.title,
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Text(idea.abstract),
+                                SizedBox(height: 8.h),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      category.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      'Category: ${idea.category.name}',
+                                      style: TextStyle(color: AppArray().colors[5]),
                                     ),
-                                    const Text('Rating: 5⭐'),
+                                    const Spacer(),
+                                    Text(
+                                      'Investment: \$${idea.expectedInvestment}',
+                                      style: TextStyle(color: AppArray().colors[3]),
+                                    ),
                                   ],
                                 ),
-                                SizedBox(height: 5.h),
-                                Text(category.description),
+                                SizedBox(height: 4.h),
+                                Row(
+                                  children: [
+                                    Icon(Icons.star, size: 16.r, color: Colors.amber),
+                                    Text(' ${idea.counts.ratings}'),
+                                    SizedBox(width: 16.w),
+                                    Icon(Icons.favorite, size: 16.r, color: Colors.red),
+                                    Text(' ${idea.counts.interests}'),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
                         );
                       },
                     );
-                  } else if (state is GetCategoryError) {
-                    return Center(
-                      child: Text(state.error),
-                    );
+                  } else if (state is EntrepreneurIdeasError) {
+                    return Center(child: Text(state.message));
                   }
-                  return const SizedBox.shrink();
+                  return const Center(child: Text('No ideas found'));
                 },
               ),
             ),
