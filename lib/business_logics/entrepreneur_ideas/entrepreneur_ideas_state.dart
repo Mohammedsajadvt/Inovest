@@ -13,18 +13,19 @@ class EntrepreneurIdeasLoading extends EntrepreneurIdeasState {}
 
 class EntrepreneurIdeasLoaded extends EntrepreneurIdeasState {
   final EntrepreneurIdeasModel ideas;
+  final EntrepreneurIdeasModel originalIdeas;
 
-  const EntrepreneurIdeasLoaded(this.ideas);
-
+  const EntrepreneurIdeasLoaded(this.ideas, {required this.originalIdeas});
+  
   @override
-  List<Object> get props => [ideas];
+  List<Object> get props => [ideas, originalIdeas];
 }
 
 class EntrepreneurIdeasError extends EntrepreneurIdeasState {
   final String message;
-
+  
   const EntrepreneurIdeasError(this.message);
-
+  
   @override
   List<Object> get props => [message];
 } 

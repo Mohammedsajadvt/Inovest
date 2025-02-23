@@ -112,8 +112,8 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
               ),
               onChanged: (value) {
                 context
-                    .read<GetCategoriesBloc>()
-                    .add(SearchCategoriesEvent(query: value));
+                    .read<EntrepreneurIdeasBloc>()
+                    .add(SearchEntrepreneurIdeas(query: value));
               },
             ),
           ],
@@ -159,8 +159,8 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                     color: AppArray().colors[1],
                     onSelected: (ascending) {
                       context
-                          .read<GetCategoriesBloc>()
-                          .add(SortCategoriesEvent(ascending));
+                          .read<EntrepreneurIdeasBloc>()
+                          .add(SortEntrepreneurIdeas(ascending: ascending));
                     },
                     itemBuilder: (context) => [
                       PopupMenuItem(

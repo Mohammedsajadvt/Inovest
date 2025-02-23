@@ -11,6 +11,41 @@ class EntrepreneurIdeasBloc extends Bloc<EntrepreneurIdeasEvent, EntrepreneurIde
 
   EntrepreneurIdeasBloc({required this.entrepreneurService}) : super(EntrepreneurIdeasInitial()) {
     on<GetEntrepreneurIdeas>(_onGetEntrepreneurIdeas);
+    on<SearchEntrepreneurIdeas>((event, emit) {
+      if (state is EntrepreneurIdeasLoaded) {
+        final currentState = state as EntrepreneurIdeasLoaded;
+        
+        // If search query is empty, show all ideas
+        if (event.query.isEmpty) {
+          emit(EntrepreneurIdeasLoaded(currentState.originalIdeas, originalIdeas: currentState.originalIdeas));
+          return;
+        }
+
+        final filteredIdeas = currentState.originalIdeas.data
+            .where((idea) =>
+                idea.title.toLowerCase().contains(event.query.toLowerCase()) ||
+                idea.abstract.toLowerCase().contains(event.query.toLowerCase()))
+            .toList()
+            .cast<EntrepreneurIdea>();
+        
+        emit(EntrepreneurIdeasLoaded(
+          EntrepreneurIdeasModel(success: true, data: filteredIdeas),
+          originalIdeas: currentState.originalIdeas,
+        ));
+      }
+    });
+
+    on<SortEntrepreneurIdeas>((event, emit) {
+      if (state is EntrepreneurIdeasLoaded) {
+        final currentState = state as EntrepreneurIdeasLoaded;
+        final sortedIdeas = List<EntrepreneurIdea>.from(currentState.ideas.data)
+          ..sort((a, b) => event.ascending
+              ? a.title.compareTo(b.title)
+              : b.title.compareTo(a.title));
+        
+        emit(EntrepreneurIdeasLoaded(EntrepreneurIdeasModel(success: true, data: sortedIdeas), originalIdeas: currentState.originalIdeas));
+      }
+    });
   }
 
   Future<void> _onGetEntrepreneurIdeas(
@@ -21,7 +56,7 @@ class EntrepreneurIdeasBloc extends Bloc<EntrepreneurIdeasEvent, EntrepreneurIde
     try {
       final ideas = await entrepreneurService.getEntrepreneurIdeas();
       if (ideas != null) {
-        emit(EntrepreneurIdeasLoaded(ideas));
+        emit(EntrepreneurIdeasLoaded(ideas, originalIdeas: ideas));
       } else {
         emit(const EntrepreneurIdeasError('Failed to load ideas'));
       }
