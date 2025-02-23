@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:inovest/business_logics/auth/auth_bloc.dart';
 import 'package:inovest/business_logics/category/category_bloc.dart';
 import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
@@ -20,13 +21,40 @@ import 'package:inovest/data/services/firebase_messaging_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
 
+// Flag to track if Firebase has been initialized
+bool _isFirebaseInitialized = false;
+
+Future<void> initializeFirebase() async {
+  if (!_isFirebaseInitialized) {
+    try {
+      if (Platform.isAndroid) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } else if (Platform.isIOS) {
+        await Firebase.initializeApp();
+      }
+      _isFirebaseInitialized = true; // Mark as initialized
+    } catch (e) {
+      // Handle any initialization errors (e.g., already initialized)
+      if (e.toString().contains('duplicate-app')) {
+        // Firebase is already initialized; proceed safely
+        _isFirebaseInitialized = true;
+      } else {
+        rethrow; // Rethrow other unexpected errors
+      }
+    }
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPreferences.getInstance();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
+  await SharedPreferences.getInstance();
+
+  await initializeFirebase();
+
+  await FirebaseMessaging.instance.getInitialMessage();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   final notificationService = NotificationService();
@@ -36,27 +64,16 @@ Future<void> main() async {
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
   final InvestorService investorService = InvestorService();
+
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => CheckBoxBloc(),
-        ),
-        BlocProvider(
-          create: (context) => AuthBloc(authService: authService),
-        ),
-        BlocProvider(
-          create: (context) => IdeasBloc(entrepreneurService),
-        ),
-        BlocProvider(
-          create: (context) => GetCategoriesBloc(entrepreneurService),
-        ),
-        BlocProvider(
-          create: (context) => ProfileBloc(profileService),
-        ),
-        BlocProvider(
-          create: (context) => InvestorIdeasBloc(investorService),
-        ),
+        BlocProvider(create: (context) => CheckBoxBloc()),
+        BlocProvider(create: (context) => AuthBloc(authService: authService)),
+        BlocProvider(create: (context) => IdeasBloc(entrepreneurService)),
+        BlocProvider(create: (context) => GetCategoriesBloc(entrepreneurService)),
+        BlocProvider(create: (context) => ProfileBloc(profileService)),
+        BlocProvider(create: (context) => InvestorIdeasBloc(investorService)),
         BlocProvider<EntrepreneurIdeasBloc>(
           create: (context) => EntrepreneurIdeasBloc(
             entrepreneurService: EntrepreneurService(),
@@ -80,9 +97,11 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           theme: ThemeData(
-              fontFamily: "JosefinSans",
-              textSelectionTheme:
-                  TextSelectionThemeData(cursorColor: AppArray().colors[5])),
+            fontFamily: "JosefinSans",
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: AppArray().colors[5],
+            ),
+          ),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           initialRoute: AppRoutes.splash,

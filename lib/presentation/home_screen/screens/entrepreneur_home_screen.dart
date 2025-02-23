@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,6 +26,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
 
   void _loadData() {
     context.read<EntrepreneurIdeasBloc>().add(GetEntrepreneurIdeas());
+    context.read<ProfileBloc>().add(GetProfile());
   }
 
   @override
@@ -54,7 +54,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                 Builder(
                   builder: (BuildContext context) {
                     return IconButton(
-                      icon: Icon(Icons.menu),
+                      icon: const Icon(Icons.menu),
                       onPressed: () {
                         Scaffold.of(context).openDrawer();
                       },
@@ -66,27 +66,28 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                   height: 100.r,
                 ),
                 BlocBuilder<ProfileBloc, ProfileState>(
-                    builder: (context, state) {
-                  if (state is GetProfileloaded) {
-                    return Padding(
-                      padding: EdgeInsets.only(right: 10.r),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/profile');
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: AppArray().colors[1],
-                          child: state.profileModel.data.imageUrl != null
-                              ? Image.network(state.profileModel.data.imageUrl!)
-                              : Icon(Icons.person, color: AppArray().colors[1]),
+                  builder: (context, state) {
+                    if (state is GetProfileloaded) {
+                      return Padding(
+                        padding: EdgeInsets.only(right: 10.r),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/profile');
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: AppArray().colors[1],
+                            child: state.profileModel.data.imageUrl != null
+                                ? Image.network(state.profileModel.data.imageUrl!)
+                                : Icon(Icons.person, color: AppArray().colors[1]),
+                          ),
                         ),
-                      ),
-                    );
-                  } else if (state is ProfileError) {
-                    log(state.message);
-                  }
-                  return const SizedBox.shrink();
-                })
+                      );
+                    } else if (state is ProfileError) {
+                      log(state.message);
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
               ],
             ),
             TextField(
@@ -101,19 +102,19 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(60),
-                  borderSide: BorderSide(color: Colors.transparent),
+                  borderSide: const BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(60),
-                  borderSide: BorderSide(color: Colors.transparent),
+                  borderSide: const BorderSide(color: Colors.transparent),
                 ),
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
               ),
               onChanged: (value) {
                 context
-                    .read<GetCategoriesBloc>()
-                    .add(SearchCategoriesEvent(query: value));
+                    .read<EntrepreneurIdeasBloc>()
+                    .add(SearchEntrepreneurIdeas(value));
               },
             ),
           ],
@@ -129,7 +130,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
             return EntrepreneurDrawer(
               username: state.profileModel.data.name,
               email: state.profileModel.data.email,
-              imageUrl: state.profileModel.data.imageUrl!,
+              imageUrl: state.profileModel.data.imageUrl ?? '',
               onHomeTap: () {},
               onProfileTap: () {},
               onSettingsTap: () {
@@ -159,15 +160,15 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                     color: AppArray().colors[1],
                     onSelected: (ascending) {
                       context
-                          .read<GetCategoriesBloc>()
-                          .add(SortCategoriesEvent(ascending));
+                          .read<EntrepreneurIdeasBloc>()
+                          .add(SortEntrepreneurIdeas(ascending));
                     },
                     itemBuilder: (context) => [
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: true,
                         child: Text('Name Ascending'),
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: false,
                         child: Text('Name Descending'),
                       ),
@@ -179,7 +180,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 12.sp),
                         ),
-                        Icon(Icons.filter_alt),
+                        const Icon(Icons.filter_alt),
                       ],
                     ),
                   ),
@@ -193,11 +194,12 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is EntrepreneurIdeasLoaded) {
                     return ListView.builder(
-                      itemCount: state.ideas.data.length,
+                      itemCount: state.displayedIdeas.length,
                       itemBuilder: (context, index) {
-                        final idea = state.ideas.data[index];
+                        final idea = state.displayedIdeas[index];
                         return Card(
-                          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 16.w, vertical: 8.h),
                           child: ListTile(
                             title: Text(
                               idea.title,
@@ -215,22 +217,26 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                                   children: [
                                     Text(
                                       'Category: ${idea.category.name}',
-                                      style: TextStyle(color: AppArray().colors[5]),
+                                      style: TextStyle(
+                                          color: AppArray().colors[5]),
                                     ),
                                     const Spacer(),
                                     Text(
                                       'Investment: \$${idea.expectedInvestment}',
-                                      style: TextStyle(color: AppArray().colors[3]),
+                                      style: TextStyle(
+                                          color: AppArray().colors[3]),
                                     ),
                                   ],
                                 ),
                                 SizedBox(height: 4.h),
                                 Row(
                                   children: [
-                                    Icon(Icons.star, size: 16.r, color: Colors.amber),
+                                    Icon(Icons.star,
+                                        size: 16.r, color: Colors.amber),
                                     Text(' ${idea.counts.ratings}'),
                                     SizedBox(width: 16.w),
-                                    Icon(Icons.favorite, size: 16.r, color: Colors.red),
+                                    Icon(Icons.favorite,
+                                        size: 16.r, color: Colors.red),
                                     Text(' ${idea.counts.interests}'),
                                   ],
                                 ),

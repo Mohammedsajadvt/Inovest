@@ -42,7 +42,6 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
     context.read<InvestorIdeasBloc>().add(GetInvestorCategories());
   }
 
-  // Handle navigation back from IdeasScreen
   void _navigateToIdeasScreen(String categoryId, String categoryName) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -53,7 +52,6 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
       ),
     );
 
-    // If IdeasScreen returns a signal to refresh (e.g., true), reload data
     if (result == true) {
       print("Returned from IdeasScreen, triggering refresh...");
       _loadData();
@@ -98,52 +96,56 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     ImageAssets.logoWhite,
                     height: 100.r,
                   ),
-                 BlocBuilder<ProfileBloc, ProfileState>(
-  builder: (context, state) {
-    if (state is GetProfileloaded) {
-      return Padding(
-        padding: EdgeInsets.only(right: 10.r),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed('/profile');
-          },
-          child: CircleAvatar(
-            backgroundColor: AppArray().colors[1],
-            child: state.profileModel.data.imageUrl != null
-                ? Image.network(
-                    state.profileModel.data.imageUrl!,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; 
+                  BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                      if (state is GetProfileloaded) {
+                        return Padding(
+                          padding: EdgeInsets.only(right: 10.r),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pushNamed('/profile');
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: AppArray().colors[1],
+                              child: state.profileModel.data.imageUrl != null
+                                  ? Image.network(
+                                      state.profileModel.data.imageUrl!,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Icon(
+                                          Icons.person,
+                                          color: AppArray().colors[1],
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.person,
+                                          color: AppArray().colors[1],
+                                        );
+                                      },
+                                    )
+                                  : Icon(
+                                      Icons.person,
+                                      color: AppArray().colors[1],
+                                    ),
+                            ),
+                          ),
+                        );
+                      } else if (state is ProfileError) {
+                        print("Profile Error: ${state.message}");
                       }
-                      return Icon(
-                        Icons.person,
-                        color: AppArray().colors[1],
-                      ); 
+                      return Padding(
+                        padding: EdgeInsets.only(right: 10.r),
+                        child: CircleAvatar(
+                          backgroundColor: AppArray().colors[1],
+                        ),
+                      );
                     },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.person,
-                        color: AppArray().colors[1],
-                      ); 
-                    },
-                  )
-                : Icon(
-                    Icons.person,
-                    color: AppArray().colors[1],
                   ),
-          ),
-        ),
-      );
-    } else if (state is ProfileError) {
-      print("Profile Error: ${state.message}");
-    }
-    return Padding(
-        padding: EdgeInsets.only(right: 10.r),
-      child: CircleAvatar(backgroundColor: AppArray().colors[1],),
-    );
-  },
-),
                 ],
               ),
               TextField(
@@ -161,7 +163,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     borderRadius: BorderRadius.circular(60),
                     borderSide: const BorderSide(color: Colors.transparent),
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
                 ),
                 onChanged: (value) {},
               ),
@@ -189,7 +192,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
       body: BlocListener<InvestorIdeasBloc, InvestorIdeasState>(
         listener: (context, state) {
           if (state is GetCategoriesBasedIdeasLoaded) {
-            Navigator.pop(context); // Close loading dialog
+            Navigator.pop(context);
             _navigateToIdeasScreen(
               state.ideas.data != null && state.ideas.data!.isNotEmpty
                   ? state.ideas.data![0].categoryId
@@ -197,13 +200,14 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
               state.categoryName ?? 'Ideas',
             );
           } else if (state is InvestorIdeasError) {
-            Navigator.pop(context); // Close loading dialog if open
+            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error: ${state.message}')),
             );
           }
         },
         child: RefreshIndicator(
+          color: AppArray().colors[5],
           onRefresh: _loadData,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -216,7 +220,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     children: [
                       Text(
                         'Explore',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.sp),
                       ),
                     ],
                   ),
@@ -228,7 +233,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     if (state is InvestorIdeasLoaded) {
                       final categories = state.investorCategories;
                       if (categories == null || categories.data.isEmpty) {
-                        return const Center(child: Text('No categories available'));
+                        return const Center(
+                            child: Text('No categories available'));
                       }
                       return SizedBox(
                         height: 50.h,
@@ -247,7 +253,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 : AppArray().colors[0];
                             Border? border = isFirstItem || patternIndex == 0
                                 ? null
-                                : Border.all(color: AppArray().colors[0], width: 2.w);
+                                : Border.all(
+                                    color: AppArray().colors[0], width: 2.w);
 
                             return GestureDetector(
                               onTap: () {
@@ -255,13 +262,15 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (context) => Center(
-                                    child: CircularProgressIndicator(color: AppArray().colors[0]),
+                                    child: CircularProgressIndicator(
+                                        color: AppArray().colors[0]),
                                   ),
                                 );
                                 context.read<InvestorIdeasBloc>().add(
                                       CategoriesIdeas(
                                         categories.data[index].id,
-                                        categoryName: categories.data[index].name,
+                                        categoryName:
+                                            categories.data[index].name,
                                       ),
                                     );
                               },
@@ -277,7 +286,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 child: Center(
                                   child: Text(
                                     categories.data[index].name.toUpperCase(),
-                                    style: TextStyle(color: textColor, fontSize: 16.sp),
+                                    style: TextStyle(
+                                        color: textColor, fontSize: 16.sp),
                                   ),
                                 ),
                               ),
@@ -288,24 +298,55 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     } else if (state is InvestorIdeasError) {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Center(child: Text('Error: ${state.message}')),
-                          SizedBox(height: 20.h),
-                          ElevatedButton(
-                            onPressed: _loadData,
-                            child: const Text('Retry'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppArray().colors[0],
-                              foregroundColor: AppArray().colors[1],
-                            ),
-                          ),
                         ],
                       );
                     }
                     return SizedBox.shrink();
                   },
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border:
+                            Border.all(width: 3.w, color: AppArray().colors[0])),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding:
+                              EdgeInsets.only(left: 20,top: 10)
+                                  .r,
+                          child: Text(
+                            'Top 5',
+                            style: TextStyle(
+                                fontSize: 20.sp, color: AppArray().colors[0]),
+                          ),
+                        ),
+                        ListView.builder(shrinkWrap: true,physics: const AlwaysScrollableScrollPhysics(),itemCount: 5,itemBuilder: (context,index){
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 10,right: 10).r,
+                            child: Card(
+                              color: AppArray().colors[1],
+                              elevation: 2,
+                              child: ListTile(
+                              leading: CircleAvatar(),
+                              title: Text('Name'),
+                              trailing: Text('5'),
+                            ),),
+                          );
+                        })
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),

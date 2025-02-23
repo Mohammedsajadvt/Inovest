@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
+import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart';
 import 'package:inovest/core/common/app_array.dart';
+import 'package:inovest/data/models/categories_ideas.dart';
 
 class IdeasScreen extends StatefulWidget {
   final String title;
@@ -19,11 +22,12 @@ class _IdeasScreenState extends State<IdeasScreen> {
   @override
   void initState() {
     super.initState();
-    print("Initializing IdeasScreen for category: \${widget.title}");
+   // context.read<InvestorIdeasBloc>().add(GetCategoriesBasedIdeasLoaded(categoryName: widget.title));
+    print("Initializing IdeasScreen for category: ${widget.title}");
   }
 
   Future<void> _onRefresh() async {
-  // context.read<InvestorIdeasBloc>().add(GetCategoriesBasedIdeasLoaded(categoryName: widget.title));
+   // context.read<InvestorIdeasBloc>().add(GetCategoriesBasedIdeasLoaded(categoryName: widget.title));
   }
 
   @override
@@ -40,9 +44,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
         backgroundColor: AppArray().colors[0],
         foregroundColor: AppArray().colors[1],
         leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
+          onPressed: () => Navigator.of(context).pop(true),
           icon: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
@@ -57,7 +59,13 @@ class _IdeasScreenState extends State<IdeasScreen> {
             child: CircleAvatar(
               backgroundColor: AppArray().colors[1],
               child: IconButton(
-                onPressed: () {},
+                onPressed: () { 
+                 List<Datum> _ideas = [];
+                  showSearch(
+                    context: context,
+                    delegate: IdeasSearchDelegate(_ideas),
+                  );
+                },
                 icon: const Icon(Icons.search),
               ),
             ),
@@ -68,7 +76,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
         onRefresh: _onRefresh,
         child: BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
           builder: (context, state) {
-            print("IdeasScreen State: \$state");
+            print("IdeasScreen State: $state");
             if (state is InvestorIdeasLoading) {
               return Center(
                 child: CircularProgressIndicator(
@@ -78,14 +86,15 @@ class _IdeasScreenState extends State<IdeasScreen> {
             } else if (state is GetCategoriesBasedIdeasLoaded) {
               final ideas = state.ideas;
               if (ideas == null || ideas.data.isEmpty) {
-                return Center(child: Text('No ideas available'));
+                return const Center(child: Text('No ideas available'));
               }
               return ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: ideas.data.length,
                 itemBuilder: (context, index) {
+                  final idea = ideas.data[index];
                   return Padding(
-                    padding: EdgeInsets.only(left: 15, right: 15, top: 15).r,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15).r,
                     child: Card(
                       color: const Color(0xffe3e8fb),
                       shape: RoundedRectangleBorder(
@@ -101,10 +110,9 @@ class _IdeasScreenState extends State<IdeasScreen> {
                               radius: 20,
                               backgroundColor: Colors.white,
                               child: Image.network(
-                                ideas.data[index].entrepreneur.imageUrl ?? '',
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.person, color: AppArray().colors[5]);
-                                },
+                                idea.entrepreneur.imageUrl ?? '',
+                                errorBuilder: (_, __, ___) =>
+                                    Icon(Icons.person, color: AppArray().colors[5]),
                               ),
                             ),
                             SizedBox(width: 12.r),
@@ -113,7 +121,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    ideas.data[index].entrepreneur.name,
+                                    idea.entrepreneur.name,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -122,19 +130,17 @@ class _IdeasScreenState extends State<IdeasScreen> {
                                   ),
                                   SizedBox(height: 4.r),
                                   Text(
-                                    ideas.data[index].datumAbstract,
+                                    idea.datumAbstract,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: AppArray().colors[5],
-                                      fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            SizedBox(width: 12.r),
                             IconButton(
                               onPressed: () {},
                               icon: Icon(
@@ -152,18 +158,66 @@ class _IdeasScreenState extends State<IdeasScreen> {
                 },
               );
             } else if (state is InvestorIdeasError) {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Center(child: Text('Error: \${state.message}')),
-              );
+              return Center(child: Text('Error: ${state.message}'));
             }
-            return const SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Center(child: Text('Loading ideas...')),
-            );
+            return const Center(child: Text('Loading ideas...'));
           },
         ),
       ),
     );
   }
+}
+class IdeasSearchDelegate extends SearchDelegate {
+  final List<Datum> ideas;
+
+  IdeasSearchDelegate(this.ideas);
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final filteredIdeas = ideas.where((idea) {
+      final queryLower = query.toLowerCase();
+      return idea.title.toLowerCase().contains(queryLower) ||
+          idea.datumAbstract.toLowerCase().contains(queryLower);
+    }).toList();
+
+    return ListView.builder(
+      itemCount: filteredIdeas.length,
+      itemBuilder: (context, index) {
+        final idea = filteredIdeas[index];
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(idea.entrepreneur.imageUrl ?? ''),
+            onBackgroundImageError: (_, __) => const Icon(Icons.person),
+          ),
+          title: Text(idea.entrepreneur.name),
+          subtitle: Text(
+            idea.datumAbstract,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          onTap: () => close(context, idea),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
+
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+        if (query.isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () => query = '',
+          ),
+      ];
 }

@@ -10,8 +10,7 @@ class GetCategoriesBloc extends Bloc<GetCategoriesEvent, GetCategoriesState> {
 
   GetCategoriesBloc(this.entrepreneurService) : super(GetCategoriesInitial()) {
     on<FetchCategoriesEvent>(_onFetchCategories);
-    on<SearchCategoriesEvent>(_onSearchCategories);
-    on<SortCategoriesEvent>(_onSortCategories);
+  
   }
 
   Future<void> _onFetchCategories(
@@ -32,27 +31,5 @@ class GetCategoriesBloc extends Bloc<GetCategoriesEvent, GetCategoriesState> {
     }
   }
 
-  void _onSearchCategories(
-      SearchCategoriesEvent event, Emitter<GetCategoriesState> emit) {
-    if (event.query.isEmpty) {
-      emit(GetCategoryLoaded(_allCategories));
-    } else {
-      final filtered = _allCategories.where((category) {
-        return category.name.toLowerCase().contains(event.query.toLowerCase());
-      }).toList();
-      emit(GetCategoryLoaded(filtered));
-    }
-  }
 
-  void _onSortCategories(
-      SortCategoriesEvent event, Emitter<GetCategoriesState> emit) {
-    if (state is GetCategoryLoaded) {
-      final currentList =
-          List<CategoryModel>.from((state as GetCategoryLoaded).categories);
-      currentList.sort((a, b) => event.ascending
-          ? a.name.compareTo(b.name)
-          : b.name.compareTo(a.name));
-      emit(GetCategoryLoaded(currentList));
-    }
-  }
 }

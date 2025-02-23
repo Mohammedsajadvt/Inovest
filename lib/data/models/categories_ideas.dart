@@ -1,19 +1,19 @@
 import 'dart:convert';
 
-class CategoriesIdeas {
+class CategoriesIdeasModel {
     bool success;
     List<Datum> data;
 
-    CategoriesIdeas({
+    CategoriesIdeasModel({
         required this.success,
         required this.data,
     });
 
-    factory CategoriesIdeas.fromRawJson(String str) => CategoriesIdeas.fromJson(json.decode(str));
+    factory CategoriesIdeasModel.fromRawJson(String str) => CategoriesIdeasModel.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory CategoriesIdeas.fromJson(Map<String, dynamic> json) => CategoriesIdeas(
+    factory CategoriesIdeasModel.fromJson(Map<String, dynamic> json) => CategoriesIdeasModel(
         success: json["success"],
         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
     );

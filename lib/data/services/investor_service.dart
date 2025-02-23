@@ -87,13 +87,13 @@ class InvestorService {
       throw Exception('Failed to fetch investor categories: $e');
     }
   }
-   Future<CategoriesIdeas?> ideas(id) async {
+   Future<CategoriesIdeasModel?> ideas(id) async {
     final url = "${ApiConstants.baseUrl}/investor/categories/$id/ideas";
     final token = await SecureStorage().getToken();
     try {
       final response = await _makeRequest(url, "GET", token: token);
       if (response != null && response.statusCode == 200) {
-        return CategoriesIdeas.fromJson(jsonDecode(response.body));
+        return CategoriesIdeasModel.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Error: ${response?.statusCode} - ${response?.body}');
       }

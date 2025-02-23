@@ -44,7 +44,7 @@ class InvestorIdeasError extends InvestorIdeasState {
 }
 
 class GetCategoriesBasedIdeasLoaded extends InvestorIdeasState {
-  final CategoriesIdeas ideas;
+  final CategoriesIdeasModel ideas;
   final String? categoryName;
 
   const GetCategoriesBasedIdeasLoaded(this.ideas, {this.categoryName});

@@ -21,3 +21,18 @@ class CreateIdeas extends IdeasEvent{
 class GetIdeas extends  IdeasEvent{}
 
 
+class SearchCategoriesEvent extends  IdeasEvent{
+  final String query;
+  const SearchCategoriesEvent({required this.query});
+  
+  @override
+  List<Object> get props => [query];
+}
+
+class SortCategoriesEvent extends  IdeasEvent{
+  final bool ascending;
+  const SortCategoriesEvent(this.ascending);
+
+  @override
+  List<Object> get props => [ascending];
+}
