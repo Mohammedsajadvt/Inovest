@@ -1,7 +1,6 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inovest/business_logics/category/category_state.dart';
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/utils/custom_text_field.dart';
@@ -187,7 +186,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<AuthBloc>().add(LogoutEvent());
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/landing', (route) => false);
+                          },
                           child: const Text(
                             'Log out',
                             style: TextStyle(color: Colors.red),

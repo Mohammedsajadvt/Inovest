@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:inovest/business_logics/category/category_state.dart';
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
 
@@ -59,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
                                   color: AppArray().colors[3]),
                             ),
                             Text(
-                              state.profileModel.data.fullName??'N/A',
+                              state.profileModel.data.fullName ?? 'N/A',
                               style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.w100,
@@ -77,9 +78,9 @@ class SettingsScreen extends StatelessWidget {
                             ))
                       ],
                     );
-                  }else if(state is ProfileError){
-                  print(state.message);
-                 }
+                  } else if (state is ProfileError) {
+                    print(state.message);
+                  }
                   return SizedBox.shrink();
                 },
               ),
@@ -88,70 +89,70 @@ class SettingsScreen extends StatelessWidget {
               ),
               BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
-                 if(state is GetProfileloaded){
-                   return Row(
-                    children: [
-                      Column(
-                        spacing: 10.h,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Email',
-                            style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppArray().colors[5]),
-                          ),
-                          Text(
-                            state.profileModel.data.email,
-                            style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w100,
-                                color: AppArray().colors[5]),
-                          ),
-                        ],
-                      )
-                    ],
-                  );
-                 }else if(state is ProfileError){
-                  print(state.message);
-                 }
-                 return SizedBox.shrink();
+                  if (state is GetProfileloaded) {
+                    return Row(
+                      children: [
+                        Column(
+                          spacing: 10.h,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email',
+                              style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppArray().colors[5]),
+                            ),
+                            Text(
+                              state.profileModel.data.email,
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w100,
+                                  color: AppArray().colors[5]),
+                            ),
+                          ],
+                        )
+                      ],
+                    );
+                  } else if (state is ProfileError) {
+                    print(state.message);
+                  }
+                  return SizedBox.shrink();
                 },
-                
               ),
               SizedBox(
                 height: 10.h,
               ),
               BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
-                 if(state is GetProfileloaded){
-                   return Row(
-                              children: [
-                                Column(
-                                  spacing: 10.h,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Mobile number',
-                                      style: TextStyle(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppArray().colors[5]),
-                                    ),
-                                    Text(
-                                      state.profileModel.data.phoneNumber.toString()??'N/A',
-                                      style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w100,
-                                          color: AppArray().colors[5]),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            );
-                 }
-                 return SizedBox.shrink();
+                  if (state is GetProfileloaded) {
+                    return Row(
+                      children: [
+                        Column(
+                          spacing: 10.h,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Mobile number',
+                              style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppArray().colors[5]),
+                            ),
+                            Text(
+                              state.profileModel.data.phoneNumber.toString() ??
+                                  'N/A',
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w100,
+                                  color: AppArray().colors[5]),
+                            ),
+                          ],
+                        )
+                      ],
+                    );
+                  }
+                  return SizedBox.shrink();
                 },
               ),
               SizedBox(
@@ -255,7 +256,11 @@ class SettingsScreen extends StatelessWidget {
                             color: AppArray().colors[3]),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          context.read<AuthBloc>().add(LogoutEvent());
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/landing', (route) => false);
+                        },
                         child: Text(
                           'Log out all account',
                           style: TextStyle(

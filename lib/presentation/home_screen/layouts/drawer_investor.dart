@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/core/common/app_array.dart';
+import 'package:inovest/core/utils/index.dart';
 
 class InvestorDrawer extends StatelessWidget {
   final String username;
@@ -9,15 +12,14 @@ class InvestorDrawer extends StatelessWidget {
   final VoidCallback onProfileTap;
   final VoidCallback onSettingsTap;
   final String imageUrl;
-  const InvestorDrawer({
-    super.key,
-    required this.username,
-    required this.email,
-    required this.onHomeTap,
-    required this.onProfileTap,
-    required this.onSettingsTap,
-    required this.imageUrl
-  });
+  const InvestorDrawer(
+      {super.key,
+      required this.username,
+      required this.email,
+      required this.onHomeTap,
+      required this.onProfileTap,
+      required this.onSettingsTap,
+      required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +113,11 @@ class InvestorDrawer extends StatelessWidget {
                 style:
                     TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
-              onTap: () {},
+              onTap: () {
+                context.read<AuthBloc>().add(LogoutEvent());
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/landing', (route) => false);
+              },
             ),
           ],
         ),

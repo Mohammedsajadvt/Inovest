@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(_onLogin);
     on<SignUpEvent>(_onSignup);
     on<TokenExpiredEvent>(_onTokenExpired);
+    on<LogoutEvent>(_onLogout);
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
@@ -110,6 +111,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } else {
       emit(AuthFailure(message: "No refresh token available, please log in again."));
+    }
+  }
+
+  Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await SecureStorage().clearTokenAndRole();
+      emit(AuthInitial());
+    } catch (e) {
+      emit(AuthFailure(message: 'Logout failed: $e'));
     }
   }
 }
