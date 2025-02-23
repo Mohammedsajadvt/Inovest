@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inovest/business_logics/auth/auth_bloc.dart';
+import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/core/common/app_array.dart';
+import 'package:inovest/core/utils/index.dart';
 
 class EntrepreneurDrawer extends StatelessWidget {
   final String username;
@@ -30,7 +31,7 @@ class EntrepreneurDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             Material(
-              elevation: 0, 
+              elevation: 0,
               color: AppArray().colors[1],
               child: UserAccountsDrawerHeader(
                 decoration: BoxDecoration(
@@ -43,7 +44,7 @@ class EntrepreneurDrawer extends StatelessWidget {
                 accountEmail:
                     Text(email, style: TextStyle(color: AppArray().colors[3])),
                 currentAccountPicture: CircleAvatar(
-                                   child: Image.network(imageUrl),
+                  child: Image.network(imageUrl),
                 ),
               ),
             ),
@@ -98,7 +99,7 @@ class EntrepreneurDrawer extends StatelessWidget {
               ),
               onTap: onSettingsTap,
             ),
-             Divider(
+            Divider(
               color: AppArray().colors[3],
               thickness: 0,
             ),
@@ -115,9 +116,12 @@ class EntrepreneurDrawer extends StatelessWidget {
                 style:
                     TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
-              onTap: () {},
-            
-      ),
+              onTap: () {
+                context.read<AuthBloc>().add(LogoutEvent());
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/landing', (route) => false);
+              },
+            ),
           ],
         ),
       ),
