@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:inovest/data/models/entrepreneur_ideas_model.dart';
 import 'package:inovest/data/services/entrepreneur_service.dart';
 
@@ -15,7 +14,6 @@ class EntrepreneurIdeasBloc extends Bloc<EntrepreneurIdeasEvent, EntrepreneurIde
       if (state is EntrepreneurIdeasLoaded) {
         final currentState = state as EntrepreneurIdeasLoaded;
         
-        // If search query is empty, show all ideas
         if (event.query.isEmpty) {
           emit(EntrepreneurIdeasLoaded(currentState.originalIdeas, originalIdeas: currentState.originalIdeas));
           return;
