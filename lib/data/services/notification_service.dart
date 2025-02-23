@@ -12,54 +12,64 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
+    try {
+      const androidChannel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      );
 
-    const androidChannel = AndroidNotificationChannel(
-      'high_importance_channel',
-      'High Importance Notifications',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(androidChannel);
 
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(androidChannel);
+      const initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const initializationSettingsIOS = DarwinInitializationSettings(
+        requestSoundPermission: false,
+        requestBadgePermission: false,
+        requestAlertPermission: false,
+      );
+      
+      const initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
 
-    const initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initializationSettingsIOS = DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
-    
-    const initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+      await _flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: _handleNotificationTap,
+      );
 
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: _handleNotificationTap,
-    );
+      Future.delayed(Duration(seconds: 2), () async {
+        try {
+          await _firebaseMessaging.requestPermission(
+            alert: true,
+            badge: true,
+            sound: true,
+            provisional: false,
+          );
 
-    String? token = await _firebaseMessaging.getToken();
-    if (token != null) {
-      await updateFcmToken(token);
-      Logger.log('FCM Token: $token');
+          String? token = await _firebaseMessaging.getToken();
+          if (token != null) {
+            await updateFcmToken(token);
+            Logger.log('FCM Token: $token');
+          }
+
+          _firebaseMessaging.onTokenRefresh.listen(updateFcmToken);
+          FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+          FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
+        } catch (e) {
+          Logger.log('Error setting up FCM: $e');
+        }
+      });
+
+    } catch (e) {
+      Logger.log('Error initializing notifications: $e');
     }
-
-    _firebaseMessaging.onTokenRefresh.listen(updateFcmToken);
-
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
   }
 
   Future<void> _handleNotificationTap(NotificationResponse details) async {
