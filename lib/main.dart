@@ -23,6 +23,7 @@ import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bl
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -30,33 +31,22 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   final notificationService = NotificationService();
-  await notificationService.initialize();
+  notificationService.initialize();
 
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
   final InvestorService investorService = InvestorService();
+  
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => CheckBoxBloc(),
-        ),
-        BlocProvider(
-          create: (context) => AuthBloc(authService: authService),
-        ),
-        BlocProvider(
-          create: (context) => IdeasBloc(entrepreneurService),
-        ),
-        BlocProvider(
-          create: (context) => GetCategoriesBloc(entrepreneurService),
-        ),
-        BlocProvider(
-          create: (context) => ProfileBloc(profileService),
-        ),
-        BlocProvider(
-          create: (context) => InvestorIdeasBloc(investorService),
-        ),
+        BlocProvider(create: (context) => CheckBoxBloc()),
+        BlocProvider(create: (context) => AuthBloc(authService: authService)),
+        BlocProvider(create: (context) => IdeasBloc(entrepreneurService)),
+        BlocProvider(create: (context) => GetCategoriesBloc(entrepreneurService)),
+        BlocProvider(create: (context) => ProfileBloc(profileService)),
+        BlocProvider(create: (context) => InvestorIdeasBloc(investorService)),
         BlocProvider<EntrepreneurIdeasBloc>(
           create: (context) => EntrepreneurIdeasBloc(
             entrepreneurService: EntrepreneurService(),
