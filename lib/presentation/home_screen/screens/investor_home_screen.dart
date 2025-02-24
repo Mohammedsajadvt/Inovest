@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,11 +8,14 @@ import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart'
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
+import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/index.dart';
+import 'package:inovest/data/models/top_ideas_model.dart';
 import 'package:inovest/presentation/home_screen/layouts/drawer_investor.dart';
 import 'package:inovest/presentation/ideas_screen/screens/ideas_screen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class InvestorHomeScreen extends StatefulWidget {
   const InvestorHomeScreen({super.key});
@@ -60,6 +65,9 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    SecureStorage().getToken().then((token) {
+      print(token);
+    });
     return Scaffold(
       backgroundColor: AppArray().colors[1],
       appBar: AppBar(
@@ -268,7 +276,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 );
                                 context.read<InvestorIdeasBloc>().add(
                                       CategoriesIdeas(
-                                        categoryId:categories.data[index].id,
+                                        categoryId: categories.data[index].id,
                                         categoryName:
                                             categories.data[index].name,
                                       ),
@@ -315,38 +323,134 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                   child: Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        border:
-                            Border.all(width: 3.w, color: AppArray().colors[0])),
+                        border: Border.all(
+                            width: 3.w, color: AppArray().colors[0])),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding:
-                              EdgeInsets.only(left: 20,top: 10)
-                                  .r,
+                          padding: EdgeInsets.only(left: 20, top: 10).r,
                           child: Text(
                             'Top 5',
                             style: TextStyle(
                                 fontSize: 20.sp, color: AppArray().colors[0]),
                           ),
                         ),
-                        ListView.builder(shrinkWrap: true,physics: const AlwaysScrollableScrollPhysics(),itemCount: 5,itemBuilder: (context,index){
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 10,right: 10).r,
-                            child: Card(
-                              color: AppArray().colors[1],
-                              elevation: 2,
-                              child: ListTile(
-                              leading: CircleAvatar(),
-                              title: Text('Name'),
-                              trailing: Text('5'),
-                            ),),
-                          );
-                        })
+                        BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
+                          builder: (context, state) {
+                            if (state is InvestorIdeasLoaded) {
+                              if (state.topIdeas != null &&
+                                  state.topIdeas!.data != null &&
+                                  state.topIdeas!.data!.isNotEmpty) {
+                                final sortedData =
+                                    List.from(state.topIdeas!.data!)
+                                      ..sort((a, b) {
+                                        final aRatings = a.count?.ratings ?? 0;
+                                        final bRatings = b.count?.ratings ?? 0;
+                                        final ratingComparison =
+                                            bRatings.compareTo(aRatings);
+                                        if (ratingComparison != 0)
+                                          return ratingComparison;
+                                        return b.createdAt
+                                            .compareTo(a.createdAt);
+                                      });
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  itemCount: min(5, sortedData.length),
+                                  itemBuilder: (context, index) {
+                                    final data = sortedData[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                              left: 10, right: 10)
+                                          .r,
+                                      child: Card(
+                                        color: AppArray().colors[1],
+                                        elevation: 2,
+                                        child: ListTile(
+                                          leading: CircleAvatar(
+                                            backgroundImage:
+                                                data.entrepreneur?.imageUrl !=
+                                                        null
+                                                    ? NetworkImage(data
+                                                        .entrepreneur!
+                                                        .imageUrl!)
+                                                    : null,
+                                          ),
+                                          title: Text(
+                                            data.entrepreneur?.name != null
+                                                ? nameValues.reverse[data
+                                                        .entrepreneur!.name] ??
+                                                    'Unknown Entrepreneur'
+                                                : 'Unknown Entrepreneur',
+                                          ),
+                                          subtitle: Text(data.title),
+                                          trailing: Text(
+                                              (data.count?.ratings ?? 0)
+                                                  .toString()),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            }
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                            left: 10, right: 10)
+                                        .r,
+                                    child: Card(
+                                      color: AppArray().colors[1],
+                                      elevation: 2,
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.grey[300],
+                                        ),
+                                        title: Container(
+                                          height: 16,
+                                          color: Colors.grey[300],
+                                        ),
+                                        subtitle: Container(
+                                          height: 14,
+                                          color: Colors.grey[300],
+                                        ),
+                                        trailing: Container(
+                                          height: 16,
+                                          width: 16,
+                                          color: Colors.grey[300],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      SizedBox(height: 10.h,)
                       ],
                     ),
                   ),
-                )
+                ),
+                   Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                            Text('Hai'),
+                            Icon(Icons.arrow_circle_right_outlined)
+                          ],),
+                   )
               ],
             ),
           ),

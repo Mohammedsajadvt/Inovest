@@ -46,9 +46,28 @@ class InvestorIdeasError extends InvestorIdeasState {
 class GetCategoriesBasedIdeasLoaded extends InvestorIdeasState {
   final CategoriesIdeasModel ideas;
   final String? categoryName;
+  final List<DatumIdeas> favoriteIdeas;
 
-  const GetCategoriesBasedIdeasLoaded(this.ideas, {this.categoryName});
+  const GetCategoriesBasedIdeasLoaded(
+    this.ideas, {
+    this.categoryName,
+    this.favoriteIdeas = const [],
+  });
+
+  GetCategoriesBasedIdeasLoaded copyWith({
+    CategoriesIdeasModel? ideas,
+    String? categoryName,
+    List<DatumIdeas>? favoriteIdeas,
+  }) {
+    return GetCategoriesBasedIdeasLoaded(
+      ideas ?? this.ideas,
+      categoryName: categoryName ?? this.categoryName,
+      favoriteIdeas: favoriteIdeas ?? this.favoriteIdeas,
+    );
+  }
 
   @override
-  List<Object?> get props => [ideas, categoryName];
+  List<Object?> get props => [ideas, categoryName, favoriteIdeas];
 }
+
+

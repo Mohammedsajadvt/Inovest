@@ -2,7 +2,7 @@ import 'dart:convert';
 
 class CategoriesIdeasModel {
     bool success;
-    List<Datum> data;
+    List<DatumIdeas> data;
 
     CategoriesIdeasModel({
         required this.success,
@@ -15,7 +15,7 @@ class CategoriesIdeasModel {
 
     factory CategoriesIdeasModel.fromJson(Map<String, dynamic> json) => CategoriesIdeasModel(
         success: json["success"],
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<DatumIdeas>.from(json["data"].map((x) => DatumIdeas.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
@@ -24,7 +24,7 @@ class CategoriesIdeasModel {
     };
 }
 
-class Datum {
+class DatumIdeas {
     String id;
     String entrepreneurId;
     String categoryId;
@@ -37,7 +37,7 @@ class Datum {
     Category category;
     Entrepreneur entrepreneur;
 
-    Datum({
+   DatumIdeas({
         required this.id,
         required this.entrepreneurId,
         required this.categoryId,
@@ -51,11 +51,11 @@ class Datum {
         required this.entrepreneur,
     });
 
-    factory Datum.fromRawJson(String str) => Datum.fromJson(json.decode(str));
+    factory DatumIdeas.fromRawJson(String str) => DatumIdeas.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+    factory DatumIdeas.fromJson(Map<String, dynamic> json) => DatumIdeas(
         id: json["id"],
         entrepreneurId: json["entrepreneurId"],
         categoryId: json["categoryId"],

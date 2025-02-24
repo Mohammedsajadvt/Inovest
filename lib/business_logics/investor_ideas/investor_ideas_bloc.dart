@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart';
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
+import 'package:inovest/data/models/categories_ideas.dart';
 import 'package:inovest/data/services/investor_service.dart';
 
 class InvestorIdeasBloc extends Bloc<InvestorIdeasEvent, InvestorIdeasState> {
@@ -57,4 +58,22 @@ class InvestorIdeasBloc extends Bloc<InvestorIdeasEvent, InvestorIdeasState> {
     emit(InvestorIdeasError(e.toString()));
   }
 });
+on<ToggleFavoriteIdea>((event, emit) {
+  if (state is GetCategoriesBasedIdeasLoaded) {
+    final currentState = state as GetCategoriesBasedIdeasLoaded;
+
+    final updatedFavorites = List<DatumIdeas>.from(currentState.favoriteIdeas);
+    if (updatedFavorites.contains(event.idea)) {
+      updatedFavorites.remove(event.idea);
+    } else {
+      updatedFavorites.insert(0, event.idea);
+    }
+
+    emit(GetCategoriesBasedIdeasLoaded(
+      currentState.ideas,
+      favoriteIdeas: updatedFavorites,
+    ));
+  }
+});
+
 }}

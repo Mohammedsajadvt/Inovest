@@ -7,36 +7,17 @@ import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/data/models/categories_ideas.dart';
 
-class IdeasScreen extends StatefulWidget {
+class IdeasScreen extends StatelessWidget {
   final String title;
   final String categoryId;
 
   const IdeasScreen({super.key, required this.title, required this.categoryId});
 
-  @override
-  _IdeasScreenState createState() => _IdeasScreenState();
-}
-
-class _IdeasScreenState extends State<IdeasScreen> {
-  final List<Datum> favoriteIdeas = [];
-
-
-
-  Future<void> _onRefresh() async {
+  Future<void> _onRefresh(BuildContext context) async {
     context.read<InvestorIdeasBloc>().add(CategoriesIdeas(
-          categoryId: widget.categoryId,
-          categoryName: widget.title,
+          categoryId: categoryId,
+          categoryName: title,
         ));
-  }
-
-  void _toggleFavorite(Datum idea) {
-    setState(() {
-      if (favoriteIdeas.contains(idea)) {
-        favoriteIdeas.remove(idea);
-      } else {
-        favoriteIdeas.insert(0, idea);
-      }
-    });
   }
 
   @override
@@ -45,13 +26,13 @@ class _IdeasScreenState extends State<IdeasScreen> {
       backgroundColor: AppArray().colors[1],
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
-        onRefresh: _onRefresh,
+        onRefresh: () => _onRefresh(context),
         child: BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
           builder: (context, state) {
             if (state is InvestorIdeasLoading) {
               return _buildLoading();
             } else if (state is GetCategoriesBasedIdeasLoaded) {
-              return _buildIdeaList(state.ideas.data);
+              return _buildIdeaList(context, state.ideas.data, state.favoriteIdeas);
             } else if (state is InvestorIdeasError) {
               return _buildError(state.message);
             }
@@ -79,7 +60,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
       centerTitle: true,
       toolbarHeight: 80.h,
       title: Text(
-        widget.title,
+        title,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       actions: [
@@ -111,9 +92,9 @@ class _IdeasScreenState extends State<IdeasScreen> {
         ),
       );
 
-  Widget _buildError(String message) => Center(child: Text('Error: \$message'));
+  Widget _buildError(String message) => Center(child: Text('Error: $message'));
 
-  Widget _buildIdeaList(List<Datum> ideas) {
+  Widget _buildIdeaList(BuildContext context, List<DatumIdeas> ideas, List<DatumIdeas> favoriteIdeas) {
     if (ideas.isEmpty) {
       return const Center(child: Text('No ideas available'));
     }
@@ -179,14 +160,12 @@ class _IdeasScreenState extends State<IdeasScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _toggleFavorite(idea),
+                    onPressed: () => context.read<InvestorIdeasBloc>().add(ToggleFavoriteIdea(idea)),
                     icon: Icon(
                       isFavorite
                           ? Icons.favorite_rounded
                           : Icons.favorite_border_rounded,
-                      color: isFavorite
-                          ? Colors.red
-                          : AppArray().colors[5],
+                      color: isFavorite ? Colors.red : AppArray().colors[5],
                       size: 24.h,
                     ),
                     padding: EdgeInsets.zero,
@@ -201,9 +180,8 @@ class _IdeasScreenState extends State<IdeasScreen> {
   }
 }
 
-
 class IdeasSearchDelegate extends SearchDelegate {
-  final List<Datum> ideas;
+  final List<DatumIdeas> ideas;
 
   IdeasSearchDelegate(this.ideas);
 
@@ -224,12 +202,11 @@ class IdeasSearchDelegate extends SearchDelegate {
     }).toList();
 
     return ListView.separated(
-        separatorBuilder: (context, index) =>  Divider(color: Color(0xff79787866),),
+      separatorBuilder: (context, index) => Divider(color: Color(0xff79787866)),
       itemCount: filteredIdeas.length,
       itemBuilder: (context, index) {
         final idea = filteredIdeas[index];
         return ListTile(
-          
           tileColor: AppArray().colors[1],
           leading: CircleAvatar(
             backgroundImage: NetworkImage(idea.entrepreneur.imageUrl ?? ''),
@@ -243,9 +220,7 @@ class IdeasSearchDelegate extends SearchDelegate {
           ),
           onTap: () => close(context, idea),
         );
-        
       },
-      
     );
   }
 

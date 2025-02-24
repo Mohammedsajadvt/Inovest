@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../data/models/categories_ideas.dart';
+
 abstract class InvestorIdeasEvent extends Equatable {
   const InvestorIdeasEvent();
 
@@ -19,4 +21,12 @@ class CategoriesIdeas extends InvestorIdeasEvent {
 
   @override
   List<Object?> get props => [categoryId, categoryName];
+}
+
+class ToggleFavoriteIdea extends InvestorIdeasEvent {
+  final DatumIdeas idea;
+
+ const ToggleFavoriteIdea(this.idea);
+   @override
+  List<Object?> get props => [idea];
 }
