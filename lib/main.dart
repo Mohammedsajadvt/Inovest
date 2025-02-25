@@ -1,24 +1,6 @@
-import 'dart:io';
-import 'package:inovest/business_logics/auth/auth_bloc.dart';
-import 'package:inovest/business_logics/category/category_bloc.dart';
-import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
-import 'package:inovest/business_logics/ideas/ideas_bloc.dart';
-import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
-import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/utils/app_routes.dart';
-import 'package:inovest/data/services/auth_service.dart';
-import 'package:inovest/data/services/entrepreneur_service.dart';
-import 'package:inovest/data/services/investor_service.dart';
-import 'package:inovest/data/services/profile_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '/core/utils/index.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:inovest/data/services/notification_service.dart';
-import 'package:inovest/data/services/firebase_messaging_handler.dart';
-import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
+import 'package:inovest/firebase_options.dart';
+
 
 bool _isFirebaseInitialized = false;
 

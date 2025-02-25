@@ -154,12 +154,12 @@ class Count {
 
 class Entrepreneur {
   String id;
-  Name? name;
+  String name;
   String? imageUrl;
 
   Entrepreneur({
     required this.id,
-    this.name,
+    required this.name,
     this.imageUrl,
   });
 
@@ -171,29 +171,21 @@ class Entrepreneur {
     print("Entrepreneur JSON: $json");
     return Entrepreneur(
       id: json["id"] ?? "",
-      name: json["name"] != null ? nameValues.map[json["name"]] : null,
+      name: json["name"] ?? "",
       imageUrl: json["imageUrl"],
     );
   }
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "name": name != null ? nameValues.reverse[name] : null,
+    "name": name,
     "imageUrl": imageUrl,
   };
 }
 
-enum Name {
-  HISHAM,
-  TEST,
-  UNNI
-}
 
-final nameValues = EnumValues({
-  "hisham": Name.HISHAM,
-  "test": Name.TEST,
-  "unni": Name.UNNI
-});
+
+
 
 enum Status {
   AVAILABLE

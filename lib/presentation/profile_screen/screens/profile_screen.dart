@@ -1,12 +1,4 @@
-import 'dart:io';
-import 'package:inovest/business_logics/auth/auth_bloc.dart';
-import 'package:inovest/business_logics/auth/auth_event.dart';
-import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/utils/custom_text_field.dart';
-import 'package:inovest/core/utils/index.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:inovest/data/models/profile_model.dart';
+import '../index.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

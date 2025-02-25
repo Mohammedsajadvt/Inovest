@@ -1,21 +1,6 @@
-import 'dart:async';
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inovest/business_logics/investor_ideas/investor_ideas_bloc.dart';
-import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart';
-import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
-import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/app_settings/secure_storage.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/common/image_assets.dart';
 import 'package:inovest/core/utils/index.dart';
-import 'package:inovest/data/models/top_ideas_model.dart';
-import 'package:inovest/presentation/home_screen/layouts/drawer_investor.dart';
-import 'package:inovest/presentation/ideas_screen/screens/ideas_screen.dart';
-import 'package:shimmer/shimmer.dart';
+
+import '../index.dart';
 
 class InvestorHomeScreen extends StatefulWidget {
   const InvestorHomeScreen({super.key});
@@ -66,7 +51,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
   @override
   Widget build(BuildContext context) {
     SecureStorage().getToken().then((token) {
-      print(token);
+      print(' My Token ${token}');
     });
     return Scaffold(
       backgroundColor: AppArray().colors[1],
@@ -243,6 +228,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                       if (categories == null || categories.data.isEmpty) {
                         return const Center(
                             child: Text('No categories available'));
+                      } else if (state is InvestorIdeasLoading) {
+                        return SizedBox.shrink();
                       }
                       return SizedBox(
                         height: 50.h,
@@ -381,15 +368,20 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                           ),
                                           title: Text(
                                             data.entrepreneur?.name != null
-                                                ? nameValues.reverse[data
-                                                        .entrepreneur!.name] ??
-                                                    'Unknown Entrepreneur'
-                                                : 'Unknown Entrepreneur',
+                                                ? data.entrepreneur.name!
+                                                : 'Unknown',
                                           ),
-                                          subtitle: Text(data.title),
-                                          trailing: Text(
-                                              (data.count?.ratings ?? 0)
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text((data.count?.ratings ?? 0)
                                                   .toString()),
+                                              Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );
@@ -414,7 +406,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                       elevation: 2,
                                       child: ListTile(
                                         leading: CircleAvatar(
-                                          backgroundColor: Colors.grey[300],
+                                          backgroundColor: Colors.grey[300] ??
+                                              AppArray().colors[1],
                                         ),
                                         title: Container(
                                           height: 16,
@@ -437,20 +430,171 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                             );
                           },
                         ),
-                      SizedBox(height: 10.h,)
+                        SizedBox(
+                          height: 10.h,
+                        ),
                       ],
                     ),
                   ),
                 ),
-                   Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                            Text('Hai'),
-                            Icon(Icons.arrow_circle_right_outlined)
-                          ],),
-                   )
+                BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
+                  builder: (context, state) {
+                    if (state is InvestorIdeasLoaded) {
+                      if (state.topIdeas == null ||
+                          state.topIdeas!.data == null) {
+                        return const Center(child: Text('No ideas available'));
+                      }
+
+                      final Map<String, List<Datum>> groupedIdeas = {};
+                      for (var idea in state.topIdeas!.data!) {
+                        if (idea.category != null) {
+                          groupedIdeas.putIfAbsent(idea.category!.id, () => []);
+                          groupedIdeas[idea.category!.id]!.add(idea);
+                        }
+                      }
+
+                      final uniqueCategories = groupedIdeas.keys
+                          .map((categoryId) => state.topIdeas!.data!
+                              .firstWhere(
+                                  (idea) => idea.category?.id == categoryId)
+                              .category!)
+                          .toList();
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: uniqueCategories.length,
+                        itemBuilder: (context, index) {
+                          final category = uniqueCategories[index];
+                          final categoryIdeas = groupedIdeas[category.id] ?? [];
+                          final colors = [Colors.yellow, Colors.tealAccent];
+
+                          final ScrollController _scrollController =
+                              ScrollController();
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      category.name,
+                                      style: TextStyle(
+                                        fontSize: 20.sp,
+                                        color: AppArray().colors[3],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (_scrollController.hasClients) {
+                                          double currentPosition =
+                                              _scrollController.offset;
+                                          double cardWidth =
+                                              130.0; 
+                                          double nextPosition =
+                                              currentPosition + cardWidth;
+
+                                          if (nextPosition <=
+                                              _scrollController
+                                                  .position.maxScrollExtent) {
+                                            _scrollController.animateTo(
+                                              nextPosition,
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              curve: Curves.easeInOut,
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: Icon(Icons.arrow_forward_ios),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Container(
+                                color: colors[index % colors.length],
+                                child: SizedBox(
+                                  height: 160.h,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    shrinkWrap: true,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    controller:
+                                        _scrollController,
+                                    itemCount: categoryIdeas.length,
+                                    itemBuilder: (context, ideaIndex) {
+                                      final idea = categoryIdeas[ideaIndex];
+                                      return Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 1.r),
+                                        child: SizedBox(
+                                          width:
+                                              130.w, 
+                                          child: Card(
+                                            color: AppArray().colors[1],
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                      left: 6, right: 6)
+                                                  .r,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(height: 10.h),
+                                                  Text(
+                                                    idea.title,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      color: Color(0xff27285B),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10.h),
+                                                  Text(
+                                                    idea.datumAbstract,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      color: Color(0xff797878),
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {},
+                                                    child: Text(
+                                                      'Know more',
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xff27285B)),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
               ],
             ),
           ),

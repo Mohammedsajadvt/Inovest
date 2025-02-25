@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/presentation/signup_screen/layouts/signup_layout.dart';
+import '../index.dart';
 
 
 class SignupScreen extends StatelessWidget {

@@ -5,4 +5,5 @@ class SvgAssets {
   static const String settings = 'assets/svg/settings.svg';
   static const String filter = 'assets/svg/filter.svg';
   static const String chats = 'assets/svg/chat.svg';
+  static const String iosForward = 'assets/svg/ios_forward.svg';
 }

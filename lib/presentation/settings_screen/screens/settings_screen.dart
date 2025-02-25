@@ -1,11 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:inovest/business_logics/auth/auth_bloc.dart';
-import 'package:inovest/business_logics/auth/auth_event.dart';
-import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/common/app_array.dart';
 
+import '../index.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 

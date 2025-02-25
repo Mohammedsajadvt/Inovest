@@ -1,14 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:inovest/business_logics/auth/auth_bloc.dart';
-import 'package:inovest/business_logics/auth/auth_event.dart';
-import 'package:inovest/business_logics/auth/auth_state.dart';
-import 'package:inovest/business_logics/checkbox/check_box_bloc.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/common/image_assets.dart';
-import 'package:inovest/core/utils/custom_button.dart';
-import 'package:inovest/core/utils/custom_text_field.dart';
+import '../index.dart';
 
 class CircleLayoutSignup extends StatefulWidget {
   const CircleLayoutSignup({super.key});

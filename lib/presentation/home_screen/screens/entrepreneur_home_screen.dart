@@ -1,14 +1,6 @@
-import 'dart:developer';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:inovest/business_logics/category/category_bloc.dart';
-import 'package:inovest/business_logics/category/category_event.dart';
-import 'package:inovest/business_logics/profile/profile_bloc.dart';
-import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/common/image_assets.dart';
-import 'package:inovest/presentation/home_screen/layouts/drawer_entrepreneur.dart';
-import 'package:inovest/business_logics/entrepreneur_ideas/entrepreneur_ideas_bloc.dart';
+import 'package:inovest/core/utils/index.dart';
+
+import '../index.dart';
 
 class EntrepreneurHomeScreen extends StatefulWidget {
   const EntrepreneurHomeScreen({Key? key}) : super(key: key);
@@ -83,7 +75,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                         ),
                       );
                     } else if (state is ProfileError) {
-                      log(state.message);
+                      print(state.message);
                     }
                     return const SizedBox.shrink();
                   },
