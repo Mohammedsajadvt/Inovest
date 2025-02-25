@@ -114,8 +114,13 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppArray().colors[1],
-        onPressed: () => Navigator.pushNamed(context, '/project'),
-        child:  Icon(Icons.add,color: AppArray().colors[5],),
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, '/project');
+          if (result == true) {
+            _loadData();
+          }
+        },
+        child: Icon(Icons.add,color: AppArray().colors[5],),
       ),
       drawer: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {

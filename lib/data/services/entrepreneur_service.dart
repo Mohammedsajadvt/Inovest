@@ -6,9 +6,15 @@ import 'package:inovest/data/models/category_model.dart';
 import 'package:inovest/data/models/ideas_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
 import 'package:inovest/data/models/entrepreneur_ideas_model.dart';
+import 'package:inovest/core/app_settings/unauthorized_notifier.dart';
 
 class EntrepreneurService {
   final AuthService _authService = AuthService();
+
+  Future<void> _handleUnauthorized() async {
+    await SecureStorage().clearTokenAndRole();
+    UnauthorizedNotifier().notifyUnauthorized();
+  }
 
   Future<IdeasModel?> createIdeas(String title, String abstract,
       double expectedInvestment, String categoryId) async {
@@ -107,41 +113,45 @@ class EntrepreneurService {
       http.Response response;
 
       if (method == "POST") {
-        response =
-            await http.post(Uri.parse(url), headers: headers, body: body);
+        response = await http.post(Uri.parse(url), headers: headers, body: body);
       } else {
         response = await http.get(Uri.parse(url), headers: headers);
       }
 
       if (response.statusCode == 401) {
-        print(" Token expired, attempting to refresh...");
+        print("Token expired, attempting to refresh...");
         final newAuth = await _authService.refreshToken();
         if (newAuth != null && newAuth.success) {
           token = await SecureStorage().getToken();
-          print(" Token refreshed successfully. Retrying the request...");
+          print("Token refreshed successfully. Retrying the request...");
+
+          final refreshedHeaders = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          };
 
           if (method == "POST") {
             response = await http.post(Uri.parse(url),
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Bearer $token",
-                },
-                body: body);
+                headers: refreshedHeaders, body: body);
           } else {
-            response = await http.get(Uri.parse(url), headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer $token",
-            });
+            response = await http.get(Uri.parse(url), headers: refreshedHeaders);
+          }
+          
+          if (response.statusCode == 401) {
+            await _handleUnauthorized();
+            throw UnauthorizedException();
           }
         } else {
-          await SecureStorage().clearTokenAndRole();
-          print("Token refresh failed. Please log in again.");
-          throw Exception("Session expired. Please log in again.");
+          await _handleUnauthorized();
+          throw UnauthorizedException();
         }
       }
 
       return response;
     } catch (e) {
+      if (e is UnauthorizedException) {
+        rethrow;
+      }
       print("Request error: $e");
       throw Exception("Error making request: $e");
     }

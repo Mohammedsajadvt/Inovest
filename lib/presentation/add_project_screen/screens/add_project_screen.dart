@@ -75,7 +75,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Project created successfully!')),
             );
-            Navigator.pop(context, state.ideas);
+            Navigator.pop(context, true);
           } else if (state is IdeasError) {
             log(state.error);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -209,7 +209,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                                     selectedCategory!.id,
                                               ),
                                             );
-                                        Navigator.pop(context);
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -227,7 +226,16 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                               foregroundColor:
                                   WidgetStatePropertyAll(AppArray().colors[1]),
                             ),
-                            child: Text('Submit'),
+                            child: state is IdeasLoading 
+                                ? SizedBox(
+                                    height: 20.h,
+                                    width: 20.w,
+                                    child: CircularProgressIndicator(
+                                      color: AppArray().colors[1],
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text('Submit'),
                           ),
                         ),
                       );
