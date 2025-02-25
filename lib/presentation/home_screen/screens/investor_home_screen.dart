@@ -1,5 +1,6 @@
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/core/app_settings/unauthorized_notifier.dart';
+import 'package:inovest/presentation/ideas_screen/screens/idea_details_screen.dart';
 
 import '../index.dart';
 
@@ -589,7 +590,15 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                                       Container(
                                                         width: double.infinity,
                                                         child: ElevatedButton(
-                                                          onPressed: () {},
+                                                          onPressed: () {
+                                                            Navigator.of(context).push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) => IdeaDetailsScreen(
+                                                                  ideaId: idea.id,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
                                                           style: ElevatedButton.styleFrom(
                                                             backgroundColor: AppArray().colors[0],
                                                             shape: RoundedRectangleBorder(
@@ -666,50 +675,61 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(15.r),
                                           ),
-                                          child: Padding(
-                                            padding: EdgeInsets.all(15.r),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  idea.title,
-                                                  style: TextStyle(
-                                                    fontSize: 18.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppArray().colors[0],
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) => IdeaDetailsScreen(
+                                                    ideaId: idea.id,
                                                   ),
                                                 ),
-                                                SizedBox(height: 8.h),
-                                                Text(
-                                                  idea.datumAbstract,
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    color: AppArray().colors[3],
-                                                  ),
-                                                ),
-                                                if (idea.category != null) ...[
-                                                  SizedBox(height: 8.h),
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(
-                                                      horizontal: 12.w,
-                                                      vertical: 6.h,
-                                                    ),
-                                                    decoration: BoxDecoration(
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.all(15.r),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    idea.title,
+                                                    style: TextStyle(
+                                                      fontSize: 18.sp,
+                                                      fontWeight: FontWeight.bold,
                                                       color: AppArray().colors[0],
-                                                      borderRadius: BorderRadius.circular(20.r),
                                                     ),
-                                                    child: Text(
-                                                      idea.category!.name,
-                                                      style: TextStyle(
-                                                        color: AppArray().colors[1],
-                                                        fontSize: 12.sp,
+                                                  ),
+                                                  SizedBox(height: 8.h),
+                                                  Text(
+                                                    idea.datumAbstract,
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      color: AppArray().colors[3],
+                                                    ),
+                                                  ),
+                                                  if (idea.category != null) ...[
+                                                    SizedBox(height: 8.h),
+                                                    Container(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: 12.w,
+                                                        vertical: 6.h,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: AppArray().colors[0],
+                                                        borderRadius: BorderRadius.circular(20.r),
+                                                      ),
+                                                      child: Text(
+                                                        idea.category!.name,
+                                                        style: TextStyle(
+                                                          color: AppArray().colors[1],
+                                                          fontSize: 12.sp,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
+                                                  ],
                                                 ],
-                                              ],
+                                              ),
                                             ),
                                           ),
                                         );

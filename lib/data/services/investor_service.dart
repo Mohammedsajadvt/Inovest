@@ -129,4 +129,19 @@ class InvestorService {
       throw Exception('Failed to search ideas: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getIdeaDetails(String ideaId) async {
+    final url = "${ApiConstants.baseUrl}/investor/ideas/$ideaId";
+    final token = await SecureStorage().getToken();
+    try {
+      final response = await _makeRequest(url, "GET", token: token);
+      if (response != null && response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Error: ${response?.statusCode} - ${response?.body}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch idea details: $e');
+    }
+  }
 }
