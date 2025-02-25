@@ -7,16 +7,40 @@ import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/data/models/categories_ideas.dart';
 
-class IdeasScreen extends StatelessWidget {
+class IdeasScreen extends StatefulWidget {
   final String title;
   final String categoryId;
+  final bool shouldLoadOnInit;
 
-  const IdeasScreen({super.key, required this.title, required this.categoryId});
+  const IdeasScreen({
+    super.key, 
+    required this.title, 
+    required this.categoryId,
+    this.shouldLoadOnInit = false,
+  });
 
-  Future<void> _onRefresh(BuildContext context) async {
+  @override
+  State<IdeasScreen> createState() => _IdeasScreenState();
+}
+
+class _IdeasScreenState extends State<IdeasScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.shouldLoadOnInit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<InvestorIdeasBloc>().add(CategoriesIdeas(
+          categoryId: widget.categoryId,
+          categoryName: widget.title,
+        ));
+      });
+    }
+  }
+
+  Future<void> _onRefresh() async {
     context.read<InvestorIdeasBloc>().add(CategoriesIdeas(
-          categoryId: categoryId,
-          categoryName: title,
+          categoryId: widget.categoryId,
+          categoryName: widget.title,
         ));
   }
 
@@ -26,7 +50,7 @@ class IdeasScreen extends StatelessWidget {
       backgroundColor: AppArray().colors[1],
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
-        onRefresh: () => _onRefresh(context),
+        onRefresh: _onRefresh,
         child: BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
           builder: (context, state) {
             if (state is InvestorIdeasLoading) {
@@ -54,13 +78,15 @@ class IdeasScreen extends StatelessWidget {
       backgroundColor: AppArray().colors[0],
       foregroundColor: AppArray().colors[1],
       leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(true),
+        onPressed: () {
+          Navigator.of(context).pop(true);
+        },
         icon: const Icon(Icons.arrow_back_ios),
       ),
       centerTitle: true,
       toolbarHeight: 80.h,
       title: Text(
-        title,
+        widget.title,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       actions: [

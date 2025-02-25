@@ -5,6 +5,7 @@ import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'dart:convert';
 import 'package:inovest/core/utils/logger.dart';
+import 'package:inovest/core/app_settings/unauthorized_notifier.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -138,6 +139,12 @@ class NotificationService {
         },
         body: jsonEncode({"token": token}),
       );
+
+      if (response.statusCode == 401) {
+        await SecureStorage().clearTokenAndRole();
+        UnauthorizedNotifier().notifyUnauthorized();
+        return;
+      }
 
       if (response.statusCode != 200) {
         Logger.log('Failed to update FCM token: ${response.body}');

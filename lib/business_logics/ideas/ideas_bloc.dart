@@ -18,7 +18,7 @@ class IdeasBloc extends Bloc<IdeasEvent, IdeasState> {
         final ideas = await entrepreneurService.createIdeas(event.title,
             event.abstract, event.expectedInvestment, event.categoryId);
         if (ideas != null) {
-          CreatedIdeas(ideas);
+          emit(CreatedIdeas(ideas));
         } else {
           emit(IdeasError("Failed to create ideas."));
         }

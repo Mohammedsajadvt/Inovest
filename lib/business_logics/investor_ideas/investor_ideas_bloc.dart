@@ -3,6 +3,7 @@ import 'package:inovest/business_logics/investor_ideas/investor_ideas_event.dart
 import 'package:inovest/business_logics/investor_ideas/investor_ideas_state.dart';
 import 'package:inovest/data/models/categories_ideas.dart';
 import 'package:inovest/data/services/investor_service.dart';
+import 'package:inovest/data/models/top_ideas_model.dart';
 
 class InvestorIdeasBloc extends Bloc<InvestorIdeasEvent, InvestorIdeasState> {
   final InvestorService investorService;
@@ -76,4 +77,41 @@ on<ToggleFavoriteIdea>((event, emit) {
   }
 });
 
-}}
+    on<SearchInvestorIdeas>((event, emit) {
+      if (state is InvestorIdeasLoaded) {
+        final currentState = state as InvestorIdeasLoaded;
+        
+        final originalData = currentState.topIdeas?.data ?? [];
+        
+        if (event.query.isEmpty) {
+          emit(InvestorIdeasLoaded(
+            topIdeas: currentState.topIdeas,
+            investorCategories: currentState.investorCategories,
+          ));
+          return;
+        }
+
+        final filteredData = originalData.where((idea) {
+          final title = idea.title.toLowerCase();
+          final abstract = idea.datumAbstract.toLowerCase();
+          final category = idea.category?.name.toLowerCase() ?? '';
+          final searchQuery = event.query.toLowerCase();
+          
+          return title.contains(searchQuery) || 
+                 abstract.contains(searchQuery) || 
+                 category.contains(searchQuery);
+        }).toList();
+
+        final filteredIdeas = TopIdeas(
+          success: currentState.topIdeas?.success ?? true,
+          data: filteredData,
+        );
+
+        emit(InvestorIdeasLoaded(
+          topIdeas: filteredIdeas,
+          investorCategories: currentState.investorCategories,
+        ));
+      }
+    });
+  }
+}
