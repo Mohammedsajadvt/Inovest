@@ -312,7 +312,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.r),
                           border: Border.all(
-                              width: 2.w, color: AppArray().colors[0])),
+                              width: 2.0.w, color: AppArray().colors[0])),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
