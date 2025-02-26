@@ -1,10 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inovest/business_logics/chat/chat_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
+import 'package:inovest/core/app_settings/secure_storage.dart';
 import '../layouts/chat_list_item.dart';
-import '../../../data/models/chat.dart';
 
-class ChatsScreen extends StatelessWidget {
+class ChatsScreen extends StatefulWidget {
   const ChatsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ChatsScreen> createState() => _ChatsScreenState();
+}
+
+class _ChatsScreenState extends State<ChatsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthAndLoadChats();
+  }
+
+  Future<void> _checkAuthAndLoadChats() async {
+    final token = await SecureStorage().getToken();
+    if (token == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please login to view chats'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        context.read<ChatBloc>().add(LoadChats());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,36 +49,30 @@ class ChatsScreen extends StatelessWidget {
             child: SearchBar(
               hintText: 'Search',
               leading: const Icon(Icons.search),
-              backgroundColor: WidgetStateProperty.all(AppArray().colors[1]),              
+              backgroundColor: WidgetStateProperty.all(AppArray().colors[1]),
             ),
           ),
         ),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: _dummyChats.length,
-        separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: (context, index) {
-          return ChatListItem(chat: _dummyChats[index]);
+      body: BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          if (state is ChatsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ChatsLoaded) {
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.chats.length,
+              separatorBuilder: (context, index) => const Divider(),
+              itemBuilder: (context, index) {
+                return ChatListItem(chat: state.chats[index]);
+              },
+            );
+          } else if (state is ChatError) {
+            return Center(child: Text(state.message));
+          }
+          return const SizedBox.shrink();
         },
       ),
     );
   }
-
-  static final List<Chat> _dummyChats = [
-    Chat(
-      id: '1',
-      name: 'John Doe',
-      lastMessage: 'What should we make?',
-      lastMessageTime: DateTime.now().subtract(const Duration(minutes: 5)),
-      unread: true,
-    ),
-    Chat(
-      id: '2',
-      name: 'MH',
-      lastMessage: 'I need help with the project.',
-      lastMessageTime: DateTime.now().subtract(const Duration(hours: 1)),
-      unread: false,
-    ),
-  ];
 } 

@@ -1,16 +1,74 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/chat.dart';
-import '../../../data/models/message.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inovest/business_logics/chat/chat_bloc.dart';
+import 'package:inovest/data/models/chat.dart';
+import 'package:inovest/data/models/chat_message.dart';
+import 'package:inovest/data/services/socket_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../layouts/message_bubble.dart';
 import '../layouts/chat_input.dart';
 
-class ChatDetailScreen extends StatelessWidget {
+class ChatDetailScreen extends StatefulWidget {
   final Chat chat;
 
   const ChatDetailScreen({
     Key? key,
     required this.chat,
   }) : super(key: key);
+
+  @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+}
+
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final SocketService _socketService = SocketService();
+  bool _isTyping = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupSocket();
+    context.read<ChatBloc>().add(LoadChatMessages(widget.chat.id));
+  }
+
+  void _setupSocket() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId != null) {
+      _socketService.connect(userId);
+      _socketService.joinChat(widget.chat.id);
+      _socketService.onNewMessage = (message) {
+        context.read<ChatBloc>().add(ReceiveMessage(message));
+      };
+    }
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _socketService.leaveChat(widget.chat.id);
+    _socketService.disconnect();
+    super.dispose();
+  }
+
+  void _handleSendMessage() {
+    final content = _messageController.text.trim();
+    if (content.isNotEmpty) {
+      context.read<ChatBloc>().add(
+            SendMessage(widget.chat.id, content, MessageType.TEXT),
+          );
+      _messageController.clear();
+    }
+  }
+
+  void _handleTyping(String value) {
+    final isTyping = value.isNotEmpty;
+    if (isTyping != _isTyping) {
+      setState(() => _isTyping = isTyping);
+      _socketService.sendTypingStatus(widget.chat.id, isTyping);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +78,7 @@ class ChatDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(chat.name),
+        title: Text(widget.chat.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.videocam),
@@ -39,37 +97,35 @@ class ChatDetailScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              reverse: true,
-              itemCount: _dummyMessages.length,
-              itemBuilder: (context, index) {
-                return MessageBubble(
-                  message: _dummyMessages[index],
-                );
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                if (state is ChatMessagesLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ChatMessagesLoaded) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    reverse: true,
+                    itemCount: state.messages.length,
+                    itemBuilder: (context, index) {
+                      return MessageBubble(
+                        message: state.messages[index],
+                      );
+                    },
+                  );
+                } else if (state is ChatError) {
+                  return Center(child: Text(state.message));
+                }
+                return const SizedBox.shrink();
               },
             ),
           ),
-          const ChatInput(),
+          ChatInput(
+            controller: _messageController,
+            onChanged: _handleTyping,
+            onSend: _handleSendMessage,
+          ),
         ],
       ),
     );
   }
-
-  static final List<Message> _dummyMessages = [
-    Message(
-      id: '2',
-      senderId: '1',
-      content: 'So excited!',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      isMe: false,
-    ),
-     Message(
-      id: '1',
-      senderId: '2',
-      content: 'Hello, how are you?',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      isMe: true,
-    ),
-  ];
 } 

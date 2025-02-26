@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:inovest/core/common/app_array.dart';
-import '../../../data/models/message.dart';
+import 'package:inovest/core/utils/index.dart';
+import 'package:inovest/data/models/chat_message.dart';
 
-class MessageBubble extends StatelessWidget {
-  final Message message;
+class MessageBubble extends StatefulWidget {
+  final ChatMessage message;
 
   const MessageBubble({
     Key? key,
@@ -11,14 +10,39 @@ class MessageBubble extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<MessageBubble> createState() => _MessageBubbleState();
+}
+
+class _MessageBubbleState extends State<MessageBubble> {
+  bool? _isMe;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (mounted) {
+      setState(() {
+        _isMe = userId == widget.message.senderId;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isMe == null) return const SizedBox.shrink();
+
     return Align(
-      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: _isMe! ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: message.isMe ? AppArray().colors[3] : AppArray().colors[1],
+          color: _isMe! ? AppArray().colors[3] : AppArray().colors[1],
           borderRadius: BorderRadius.circular(16),
         ),
         child: _buildMessageContent(context),
@@ -27,20 +51,20 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildMessageContent(BuildContext context) {
-    switch (message.type) {
-      case MessageType.image:
+    switch (widget.message.messageType) {
+      case MessageType.IMAGE:
         return Image.network(
-          message.content,
+          widget.message.content,
           width: 200,
           height: 200,
           fit: BoxFit.cover,
         );
-      case MessageType.link:
-      case MessageType.text:
-      return Text(
-          message.content,
+      case MessageType.TEXT:
+      default:
+        return Text(
+          widget.message.content,
           style: TextStyle(
-            color: message.isMe ? AppArray().colors[1] : AppArray().colors[0],
+            color: _isMe! ? AppArray().colors[1] : AppArray().colors[0],
           ),
         );
     }

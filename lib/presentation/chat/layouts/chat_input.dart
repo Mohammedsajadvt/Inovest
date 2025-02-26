@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:inovest/core/common/app_array.dart';
 
 class ChatInput extends StatelessWidget {
-  const ChatInput({Key? key}) : super(key: key);
+  final TextEditingController controller;
+  final Function(String) onChanged;
+  final VoidCallback onSend;
+
+  const ChatInput({
+    Key? key,
+    required this.controller,
+    required this.onChanged,
+    required this.onSend,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,21 +30,23 @@ class ChatInput extends StatelessWidget {
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.text_format),
+            icon: const Icon(Icons.attach_file),
             onPressed: () {},
           ),
           Expanded(
             child: TextField(
-              decoration: InputDecoration(
+              controller: controller,
+              onChanged: onChanged,
+              decoration: const InputDecoration(
                 hintText: 'Message',
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                contentPadding: EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.mic),
-            onPressed: () {},
+            icon: const Icon(Icons.send),
+            onPressed: onSend,
           ),
         ],
       ),
