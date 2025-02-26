@@ -4,6 +4,7 @@ import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/data/models/profile_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
+import 'package:inovest/core/app_settings/unauthorized_notifier.dart';
 
 class ProfileService {
   final AuthService _authService = AuthService();
@@ -13,6 +14,11 @@ class ProfileService {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",
     };
+  }
+
+  Future<void> _handleUnauthorized() async {
+    await SecureStorage().clearTokenAndRole();
+    UnauthorizedNotifier().notifyUnauthorized();
   }
 
   Future<http.Response?> _makeRequest(String url, String method,
@@ -45,15 +51,22 @@ class ProfileService {
           } else {
             response = await http.get(Uri.parse(url), headers: refreshedHeaders);
           }
+
+          if (response.statusCode == 401) {
+            await _handleUnauthorized();
+            throw UnauthorizedException();
+          }
         } else {
-          await SecureStorage().clearTokenAndRole();
-          print("Token refresh failed. Please log in again.");
-          throw Exception("Session expired. Please log in again.");
+          await _handleUnauthorized();
+          throw UnauthorizedException();
         }
       }
 
       return response;
     } catch (e) {
+      if (e is UnauthorizedException) {
+        rethrow;
+      }
       print("Request error: $e");
       throw Exception("Error making request: $e");
     }
