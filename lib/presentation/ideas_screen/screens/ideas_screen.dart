@@ -50,6 +50,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
       backgroundColor: AppArray().colors[1],
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
+        color: AppArray().colors[5],
         onRefresh: _onRefresh,
         child: BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
           builder: (context, state) {

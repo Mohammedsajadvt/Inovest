@@ -187,7 +187,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
               username: state.profileModel.data.name,
               email: state.profileModel.data.email,
               imageUrl: state.profileModel.data.imageUrl ?? '',
-              onHomeTap: () {},
+             onHomeTap: () {
+              },
               onProfileTap: () {},
               onSettingsTap: () {
                 Navigator.of(context).pushNamed('/settings');
@@ -298,7 +299,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                           ),
                         );
                       }
-                      return const Center(child: CircularProgressIndicator());
+                      return  Center(child: CircularProgressIndicator(color: AppArray().colors[0],));
                     },
                   ),
                   SizedBox(

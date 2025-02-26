@@ -370,7 +370,6 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              // TODO: Implement contact functionality
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppArray().colors[0],
@@ -405,7 +404,6 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
           ),
           child: IconButton(
             onPressed: () {
-              // TODO: Implement favorite functionality
             },
             icon: Icon(
               Icons.favorite_border,
