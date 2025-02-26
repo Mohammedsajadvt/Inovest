@@ -1,5 +1,8 @@
 import '/core/utils/index.dart';
 import 'package:inovest/firebase_options.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:inovest/business_logics/chat/chat_bloc.dart';
+import 'package:inovest/data/services/chat_service.dart';
 
 
 bool _isFirebaseInitialized = false;
@@ -7,12 +10,18 @@ bool _isFirebaseInitialized = false;
 Future<void> initializeFirebase() async {
   if (!_isFirebaseInitialized) {
     try {
-      if (Platform.isAndroid) {
+      if (kIsWeb) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
-      } else if (Platform.isIOS) {
-        await Firebase.initializeApp();
+      } else {
+        if (Platform.isAndroid) {
+          await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform,
+          );
+        } else if (Platform.isIOS) {
+          await Firebase.initializeApp();
+        }
       }
       _isFirebaseInitialized = true; 
     } catch (e) {
@@ -32,16 +41,19 @@ Future<void> main() async {
 
   await initializeFirebase();
 
-  await FirebaseMessaging.instance.getInitialMessage();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  if (!kIsWeb) {
+    await FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  final notificationService = NotificationService();
-  notificationService.initialize();
+    final notificationService = NotificationService();
+    notificationService.initialize();
+  }
 
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
   final InvestorService investorService = InvestorService();
+  final ChatService chatService = ChatService();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -56,6 +68,7 @@ Future<void> main() async {
             entrepreneurService: EntrepreneurService(),
           ),
         ),
+        BlocProvider(create: (context) => ChatBloc(chatService)),
       ],
       child: MyApp(),
     ),

@@ -52,8 +52,10 @@ class EntrepreneurDrawer extends StatelessWidget {
               leading: Icon(Icons.email_outlined, color: AppArray().colors[5]),
               title: Text('Enquiries',
                   style: TextStyle(color: AppArray().colors[3])),
-              onTap: onHomeTap,
-              trailing: CircleAvatar(
+              onTap: () {
+                Navigator.of(context).pushNamed('/chats');
+              },
+              trailing: const CircleAvatar(
                 radius: 15,
                 child: Text('2'),
               ),

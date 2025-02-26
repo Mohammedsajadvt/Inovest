@@ -53,7 +53,9 @@ class InvestorDrawer extends StatelessWidget {
                   Icon(Icons.chat_bubble_outline, color: AppArray().colors[5]),
               title:
                   Text('Chats', style: TextStyle(color: AppArray().colors[3])),
-              onTap: onHomeTap,
+              onTap: () {
+                Navigator.of(context).pushNamed('/chats');
+              },
             ),
             Divider(
               color: AppArray().colors[3],
