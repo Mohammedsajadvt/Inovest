@@ -9,6 +9,7 @@ class ChatMessage {
   final String content;
   final MessageType messageType;
   final DateTime createdAt;
+  final User? sender;
 
   ChatMessage({
     required this.id,
@@ -17,27 +18,35 @@ class ChatMessage {
     required this.content,
     required this.messageType,
     required this.createdAt,
+    this.sender,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
-    if (json.isEmpty) {
-      throw ArgumentError('json cannot be null');
+    try {
+      return ChatMessage(
+        id: json['id'] as String? ?? '',
+        chatId: json['chatId'] as String? ?? '',
+        senderId: json['senderId'] as String? ?? '',
+        content: json['content'] as String? ?? '',
+        messageType: json['messageType'] != null
+            ? MessageType.values.firstWhere(
+                (e) => e.toString() == 'MessageType.${json['messageType']}',
+                orElse: () => MessageType.TEXT,
+              )
+            : MessageType.TEXT,
+        createdAt: json['createdAt'] != null 
+            ? DateTime.parse(json['createdAt'] as String)
+            : DateTime.now(),
+        sender: json['sender'] != null 
+            ? User.fromJson(json['sender'] as Map<String, dynamic>)
+            : null,
+      );
+    } catch (e, stackTrace) {
+      print('Error parsing ChatMessage: $e');
+      print('Stack trace: $stackTrace');
+      print('JSON data: $json');
+      rethrow;
     }
-    return ChatMessage(
-      id: json['id'] ?? '',
-      chatId: json['chatId'] ?? '',
-      senderId: json['senderId'] ?? '',
-      content: json['content'] ?? '',
-      messageType: json['messageType'] != null
-          ? MessageType.values.firstWhere(
-              (e) => e.toString() == 'MessageType.${json['messageType']}',
-              orElse: () => MessageType.TEXT,
-            )
-          : MessageType.TEXT,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-    );
   }
 
   Map<String, dynamic> toJson() {
@@ -48,6 +57,7 @@ class ChatMessage {
       'content': content,
       'messageType': messageType.toString().split('.').last,
       'createdAt': createdAt.toIso8601String(),
+      if (sender != null) 'sender': sender!.toJson(),
     };
   }
 } 

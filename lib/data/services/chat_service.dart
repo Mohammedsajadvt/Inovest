@@ -58,8 +58,13 @@ class ChatService {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => ChatMessage.fromJson(json)).toList();
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData['success'] == true && responseData['data'] != null) {
+        final List<dynamic> messagesData = responseData['data'];
+        return messagesData.map((json) => ChatMessage.fromJson(json as Map<String, dynamic>)).toList();
+      } else {
+        throw Exception('Invalid response format');
+      }
     } else {
       throw Exception('Failed to load chat messages');
     }
