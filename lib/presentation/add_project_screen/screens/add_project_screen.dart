@@ -170,14 +170,19 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                   ),
                   SliderTheme(
                     data: SliderThemeData(
-                        thumbColor: AppArray().colors[5],
-                        activeTrackColor: Colors.grey[200],
-                        inactiveTrackColor: AppArray().colors[5]),
+                      thumbColor: AppArray().colors[5],
+                      activeTrackColor: Colors.grey[200],
+                      inactiveTrackColor: AppArray().colors[5],
+                    ),
                     child: RangeSlider(
                       values: _currentRangeValues,
                       min: 100,
                       max: 100000,
                       divisions: 1000,
+                      labels: RangeLabels(
+                        '\$${_currentRangeValues.start.toInt()}',
+                        '\$${_currentRangeValues.end.toInt()}',
+                      ),
                       onChanged: (RangeValues values) {
                         setState(() {
                           _currentRangeValues = values;
@@ -203,7 +208,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                                 abstract:
                                                     _abstractController.text,
                                                 expectedInvestment:
-                                                    _currentRangeValues.end
+                                                    _currentRangeValues.start
                                                         .toDouble(),
                                                 categoryId:
                                                     selectedCategory!.id,
@@ -226,7 +231,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                               foregroundColor:
                                   WidgetStatePropertyAll(AppArray().colors[1]),
                             ),
-                            child: state is IdeasLoading 
+                            child: state is IdeasLoading
                                 ? SizedBox(
                                     height: 20.h,
                                     width: 20.w,

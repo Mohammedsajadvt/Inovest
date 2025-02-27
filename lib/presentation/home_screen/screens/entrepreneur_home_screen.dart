@@ -69,12 +69,39 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                           child: CircleAvatar(
                             backgroundColor: AppArray().colors[1],
                             child: state.profileModel.data.imageUrl != null
-                                ? Image.network(state.profileModel.data.imageUrl!)
-                                : Icon(Icons.person, color: AppArray().colors[1]),
+                                ? Image.network(
+                                    state.profileModel.data.imageUrl!,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                        color: Colors.white,
+                                      );
+                                    },
+                                    errorBuilder: (context, error,
+                                            stackTrace) =>
+                                        Icon(Icons.person, color: Colors.white),
+                                  )
+                                : Icon(Icons.person, color: Colors.white),
                           ),
                         ),
                       );
-                    } else if (state is ProfileError) {
+                    }else if(state is  ProfileLoading){
+                     return Padding(
+                        padding: EdgeInsets.only(right: 10.r),
+                       child: CircleAvatar(backgroundColor: Colors.white,),
+                     );
+                    } 
+                    else if (state is ProfileError) {
                       print(state.message);
                     }
                     return const SizedBox.shrink();
@@ -120,7 +147,10 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
             _loadData();
           }
         },
-        child: Icon(Icons.add,color: AppArray().colors[5],),
+        child: Icon(
+          Icons.add,
+          color: AppArray().colors[5],
+        ),
       ),
       drawer: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
