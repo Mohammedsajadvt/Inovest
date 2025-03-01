@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:inovest/core/common/api_constants.dart';
-import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/data/models/chat.dart';
 import 'package:inovest/data/models/chat_message.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
@@ -22,7 +21,7 @@ class ChatService {
     }
 
     final response = await _client.get(
-      Uri.parse('${ApiConstants.baseUrl}/investor/chats'),
+      Uri.parse('${ApiConstants.baseUrl}/chats'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
