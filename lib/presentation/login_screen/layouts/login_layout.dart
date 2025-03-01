@@ -90,16 +90,19 @@ class _CircleLayoutLoginState extends State<CircleLayoutLogin> {
                       Padding(
                         padding: const EdgeInsets.only(top: 6, left: 200).r,
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushNamed(context, '/forgot-password');
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                'forgot password?',
+                                'Forgot password?',
                                 style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    color: AppArray().colors[5],
-                                    fontWeight: FontWeight.bold),
+                                  decoration: TextDecoration.underline,
+                                  color: AppArray().colors[5],
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
