@@ -1,3 +1,4 @@
+import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/data/models/chat_message.dart';
@@ -8,10 +9,14 @@ class SocketService {
   Function(String, bool)? onTypingStatus;
   Function(String, String)? onUserStatus;
 
-  void connect(String userId) {
-    socket = io.io(ApiConstants.baseUrl, <String, dynamic>{
+  Future<void> connect(String userId) async {
+    
+    final token = await SecureStorage().getToken();
+
+    socket = io.io(ApiConstants.serverUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
+      'auth': {'token': token},
       'query': {'userId': userId},
     });
 
