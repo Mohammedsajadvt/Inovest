@@ -28,7 +28,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void initState() {
     super.initState();
     _token = widget.token ?? '';
-    print('Reset password screen initialized with token: $_token'); // Debug log
+    print('Reset password screen initialized with token: $_token');
     
     if (_token.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

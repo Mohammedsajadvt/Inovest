@@ -58,7 +58,7 @@ class DeepLinkService {
       if (hashUri.path == '/reset-password') {
         final token = hashUri.queryParameters['token'];
         if (token != null && token.isNotEmpty) {
-          print('Found reset token: $token'); // Debug log
+          print('Found reset token: $token');
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.pushNamed(
               context,
