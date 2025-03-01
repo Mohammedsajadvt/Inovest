@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:inovest/business_logics/auth/auth_bloc.dart';
-import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/core/app_settings/secure_storage.dart';
 import 'package:inovest/core/common/api_constants.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/data/models/auth_model.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class AuthService {
   Future<AuthModel?> loginUser(String email, String password) async {
@@ -127,6 +127,81 @@ class AuthService {
       }
     } catch (e) {
       print('Google login failed: $e');
+      return AuthModel(success: false, message: 'An error occurred: $e');
+    }
+  }
+
+  Future<AuthModel?> forgotPassword(String email) async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.forgotPassword}";
+
+    String platform;
+    Map<String, dynamic> requestBody = {"email": email};
+
+    if (kIsWeb) {
+      platform = "web";
+      requestBody["clientUrl"] = ApiConstants.webClientUrl;
+    } else if (Platform.isIOS) {
+      platform = "ios";
+    } else {
+      platform = "android";
+    }
+
+    requestBody["platform"] = platform;
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: true,
+          message: responseBody['message'] ?? 'Reset instructions sent to your email',
+        );
+      } else {
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: false,
+          message: responseBody['message'] ?? 'Failed to process request',
+        );
+      }
+    } catch (e) {
+      print('Forgot password failed: $e');
+      return AuthModel(success: false, message: 'An error occurred: $e');
+    }
+  }
+
+  Future<AuthModel?> resetPassword(String token, String newPassword) async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.resetPassword}";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "token": token,
+          "password": newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: true,
+          message: responseBody['message'] ?? 'Password reset successful',
+        );
+      } else {
+        final responseBody = jsonDecode(response.body);
+        return AuthModel(
+          success: false,
+          message: responseBody['message'] ?? 'Failed to reset password',
+        );
+      }
+    } catch (e) {
+      print('Reset password failed: $e');
       return AuthModel(success: false, message: 'An error occurred: $e');
     }
   }

@@ -1,9 +1,11 @@
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/presentation/add_project_screen/screens/add_project_screen.dart';
 import 'package:inovest/presentation/chat/screens/chats_screen.dart';
+import 'package:inovest/presentation/forgot_password/screens/forgot_password_screen.dart';
 import 'package:inovest/presentation/home_screen/screens/entrepreneur_home_screen.dart';
 import 'package:inovest/presentation/home_screen/screens/investor_home_screen.dart';
 import 'package:inovest/presentation/profile_screen/screens/profile_screen.dart';
+import 'package:inovest/presentation/reset_password/screens/reset_password_screen.dart';
 import 'package:inovest/presentation/settings_screen/screens/settings_screen.dart';
 import 'package:inovest/presentation/splash_screen/screens/splash_screen.dart';
 
@@ -18,7 +20,9 @@ class AppRoutes {
   static const String project = '/project';
   static const String settings = '/settings';
   static const String profile = '/profile';
-  static Map<String, WidgetBuilder> routes = {
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
+  static Map<String, Widget Function(BuildContext)> routes = {
     splash: (context) => SplashScreen(),
     landing: (context) => LandingScreen(),
     login: (context) => LoginScreen(),
@@ -29,5 +33,11 @@ class AppRoutes {
     project: (context) => const AddProjectScreen(),
     settings: (context) => const SettingsScreen(),
     profile:(context) => const ProfileScreen(),
+    forgotPassword: (context) => const ForgotPasswordScreen(),
+    resetPassword: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final token = args is String ? args : '';
+      return ResetPasswordScreen(token: token);
+    },
   };
 }

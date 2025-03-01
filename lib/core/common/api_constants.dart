@@ -9,4 +9,7 @@ class ApiConstants {
   static const String investorCategories = "/investor/categories";
   static const String topIdeas = "/investor/ideas/top";
   static const String googleLogin = "/auth/google-login";
+  static const String forgotPassword = "/auth/forgot-password";
+  static const String resetPassword = "/auth/reset-password";
+  static const String webClientUrl = "http://localhost:52798/#";
 }

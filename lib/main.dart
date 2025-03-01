@@ -3,6 +3,7 @@ import 'package:inovest/firebase_options.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:inovest/business_logics/chat/chat_bloc.dart';
 import 'package:inovest/data/services/chat_service.dart';
+import 'package:inovest/core/services/deep_link_service.dart';
 
 
 bool _isFirebaseInitialized = false;
@@ -75,8 +76,31 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDeepLinks();
+  }
+
+  Future<void> _initializeDeepLinks() async {
+    await Future.delayed(Duration.zero);
+    if (!mounted) return;
+    
+    final context = _navigatorKey.currentContext;
+    if (context != null) {
+      await DeepLinkService.setupDeepLinks(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +110,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
+          navigatorKey: _navigatorKey,
           theme: ThemeData(
             scaffoldBackgroundColor: AppArray().colors[1],
             fontFamily: "JosefinSans",
