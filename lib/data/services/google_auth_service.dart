@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:inovest/core/app_settings/secure_storage.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 import 'package:inovest/data/models/auth_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
 
@@ -20,7 +20,6 @@ class GoogleAuthService {
         idToken: googleAuth.idToken,
       );
 
-
       final firebase.UserCredential authResult = 
           await _auth.signInWithCredential(credential);
       final firebase.User? user = authResult.user;
@@ -35,10 +34,14 @@ class GoogleAuthService {
         if (response != null && response.success) {
           final accessToken = response.data?.tokens.accessToken ?? "";
           final userRole = response.data?.user.role ?? "GUEST";
+          final userId = response.data?.user.id ?? "";
 
           if (accessToken.isNotEmpty) {
-            await SecureStorage().saveToken(accessToken);
-            await SecureStorage().saveRole(userRole);
+            await UserUtils.saveUserData(
+              token: accessToken,
+              role: userRole,
+              userId: userId,
+            );
           }
         }
         return response;
@@ -53,6 +56,6 @@ class GoogleAuthService {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-    await SecureStorage().clearTokenAndRole();
+    await UserUtils.clearUserData();
   }
 } 

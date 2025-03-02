@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inovest/business_logics/chat/chat_bloc.dart';
 import 'package:inovest/core/common/app_array.dart';
-import 'package:inovest/core/app_settings/secure_storage.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 import '../layouts/chat_list_item.dart';
 
 class ChatsScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 
   Future<void> _checkAuthAndLoadChats() async {
-    final token = await SecureStorage().getToken();
+    final token = await UserUtils.getToken();
     if (token == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

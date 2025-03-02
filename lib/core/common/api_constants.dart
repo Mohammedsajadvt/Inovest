@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String serverUrl = "https://inovest-api.onrender.com/";
+  static const String serverUrl = "https://inovest-api-ezgy.vercel.app/";
   static const String baseUrl = "${serverUrl}api";
   static const String loginEndpoint = "/auth/login";
   static const String signupEndpoint = "/auth/signup";

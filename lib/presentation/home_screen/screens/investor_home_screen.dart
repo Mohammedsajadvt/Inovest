@@ -1,6 +1,7 @@
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/core/app_settings/unauthorized_notifier.dart';
 import 'package:inovest/presentation/ideas_screen/screens/idea_details_screen.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 
 import '../index.dart';
 
@@ -60,7 +61,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    SecureStorage().getToken().then((token) {
+    UserUtils.getToken().then((token) {
       print(' My Token ${token}');
     });
     return Scaffold(

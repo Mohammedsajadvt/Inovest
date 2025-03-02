@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/business_logics/chat/chat_bloc.dart';
 import 'package:inovest/data/models/chat.dart';
 import 'package:inovest/data/models/chat_message.dart';
 import 'package:inovest/data/services/socket_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:inovest/core/common/app_array.dart';
 import '../layouts/message_bubble.dart';
 import '../layouts/chat_input.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final Chat chat;
 
   const ChatDetailScreen({
-    Key? key,
+    super.key,
     required this.chat,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
@@ -33,8 +35,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   void _setupSocket() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final userId = await UserUtils.getCurrentUserId();
     if (userId != null) {
       _socketService.connect(userId);
       _socketService.joinChat(widget.chat.id);
@@ -55,10 +56,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   void _handleSendMessage() {
     final content = _messageController.text.trim();
     if (content.isNotEmpty) {
-      context.read<ChatBloc>().add(
-            SendMessage(widget.chat.id, content, MessageType.TEXT),
-          );
+      final message = SendMessage(widget.chat.id, content, MessageType.TEXT);
+      context.read<ChatBloc>().add(message);
       _messageController.clear();
+      
+      setState(() {});
     }
   }
 
@@ -73,12 +75,53 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppArray().colors[1],
       appBar: AppBar(
+        backgroundColor: AppArray().colors[0],
+        foregroundColor: AppArray().colors[1],
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(widget.chat.name),
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 20.r,
+              backgroundImage: widget.chat.avatarUrl != null 
+                ? NetworkImage(widget.chat.avatarUrl!)
+                : null,
+              backgroundColor: AppArray().colors[1],
+              child: widget.chat.avatarUrl == null
+                ? Icon(Icons.person, color: AppArray().colors[0])
+                : null,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.chat.name,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (_isTyping) ...[
+                    Text(
+                      'typing...',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: AppArray().colors[1].withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.videocam),
@@ -103,12 +146,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is ChatMessagesLoaded) {
                   return ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     reverse: true,
                     itemCount: state.messages.length,
                     itemBuilder: (context, index) {
+                      final message = state.messages[index];
+                      final isLastMessage = index == 0;
+                      final isSeen = isLastMessage && !widget.chat.unread;
                       return MessageBubble(
-                        message: state.messages[index],
+                        message: message,
+                        isSeen: isSeen,
                       );
                     },
                   );
