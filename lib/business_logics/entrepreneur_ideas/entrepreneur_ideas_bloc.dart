@@ -14,6 +14,7 @@ class EntrepreneurIdeasBloc
     on<GetEntrepreneurIdeas>(_onGetEntrepreneurIdeas);
     on<SortEntrepreneurIdeas>(_onSortEntrepreneurIdeas);
     on<SearchEntrepreneurIdeas>(_onSearchEntrepreneurIdeas);
+    on<FilterEntrepreneurIdeas>(_onFilterEntrepreneurIdeas);
   }
 
   Future<void> _onGetEntrepreneurIdeas(
@@ -64,6 +65,24 @@ class EntrepreneurIdeasBloc
           : currentState.allIdeas
               .where((idea) =>
                   idea.title.toLowerCase().contains(event.query.toLowerCase()))
+              .toList();
+      emit(EntrepreneurIdeasLoaded(
+        allIdeas: currentState.allIdeas,
+        displayedIdeas: filteredIdeas,
+      ));
+    }
+  }
+
+  void _onFilterEntrepreneurIdeas(
+    FilterEntrepreneurIdeas event,
+    Emitter<EntrepreneurIdeasState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is EntrepreneurIdeasLoaded) {
+      final filteredIdeas = event.status == 'ALL'
+          ? currentState.allIdeas
+          : currentState.allIdeas
+              .where((idea) => idea.status == event.status)
               .toList();
       emit(EntrepreneurIdeasLoaded(
         allIdeas: currentState.allIdeas,
