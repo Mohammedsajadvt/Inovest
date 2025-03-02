@@ -1,13 +1,12 @@
 import '../index.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   Future<void> _checkLoginStatus(BuildContext context) async {
-    SecureStorage secureStorage = SecureStorage();
-
-    String? token = await secureStorage.getToken();
-    String? role = await secureStorage.getRole();
+    final token = await UserUtils.getToken();
+    final role = await UserUtils.getCurrentUserRole();
 
     if (!context.mounted) return;
 

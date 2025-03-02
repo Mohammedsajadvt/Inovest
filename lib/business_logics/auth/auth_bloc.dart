@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inovest/business_logics/auth/auth_event.dart';
 import 'package:inovest/business_logics/auth/auth_state.dart';
-import 'package:inovest/core/app_settings/secure_storage.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 import 'package:inovest/data/models/auth_model.dart';
 import 'package:inovest/data/services/auth_service.dart';
 
@@ -25,10 +25,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final accessToken = response.data?.tokens?.accessToken ?? "";
       final refreshToken = response.data?.tokens?.refreshToken ?? "";
       final userRole = response.data?.user?.role ?? "GUEST";
+      final userId = response.data?.user?.id ?? "";
 
       if (accessToken.isNotEmpty) {
-        await SecureStorage().saveToken(accessToken);
-        await SecureStorage().saveRole(userRole);
+        await UserUtils.saveUserData(
+          token: accessToken,
+          role: userRole,
+          userId: userId,
+        );
       } else {
         print("⚠️ No access token received.");
       }
@@ -62,10 +66,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           final accessToken = loginResponse.data?.tokens?.accessToken ?? "";
           final refreshToken = loginResponse.data?.tokens?.refreshToken ?? "";
           final userRole = loginResponse.data?.user?.role ?? event.role;
+          final userId = loginResponse.data?.user?.id ?? "";
 
           if (accessToken.isNotEmpty) {
-            await SecureStorage().saveToken(accessToken);
-            await SecureStorage().saveRole(userRole);
+            await UserUtils.saveUserData(
+              token: accessToken,
+              role: userRole,
+              userId: userId,
+            );
           } else {
             print("⚠️ No access token received after login.");
           }
@@ -86,7 +94,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onTokenExpired(TokenExpiredEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
-    final refreshToken = await SecureStorage().getToken();
+    final refreshToken = await UserUtils.getToken();
     if (refreshToken != null && refreshToken.isNotEmpty) {
       final newAuthModel = await authService.refreshToken();
 
@@ -94,10 +102,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final accessToken = newAuthModel.data?.tokens?.accessToken ?? "";
         final refreshToken = newAuthModel.data?.tokens?.refreshToken ?? "";
         final userRole = newAuthModel.data?.user?.role ?? "GUEST";
+        final userId = newAuthModel.data?.user?.id ?? "";
 
         if (accessToken.isNotEmpty) {
-          await SecureStorage().saveToken(accessToken);
-          await SecureStorage().saveRole(userRole);
+          await UserUtils.saveUserData(
+            token: accessToken,
+            role: userRole,
+            userId: userId,
+          );
         }
 
         emit(AuthSuccess(
@@ -117,7 +129,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      await SecureStorage().clearTokenAndRole();
+      await UserUtils.clearUserData();
       emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure(message: 'Logout failed: $e'));

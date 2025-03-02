@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/data/services/investor_service.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:inovest/core/utils/navigation_helper.dart';
+import 'package:inovest/core/utils/user_utils.dart';
 
 class IdeaDetailsScreen extends StatefulWidget {
   final String ideaId;
@@ -20,11 +22,22 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
   late Future<Map<String, dynamic>> _ideaDetailsFuture;
   final InvestorService _investorService = InvestorService();
   int _currentRating = 0;
+  Map<String, dynamic>? _currentIdeaData;
+  final TextEditingController _commentController = TextEditingController();
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
     _ideaDetailsFuture = _investorService.getIdeaDetails(widget.ideaId);
+    _getCurrentUserId();
+  }
+
+  Future<void> _getCurrentUserId() async {
+    final userId = await UserUtils.getCurrentUserId();
+    setState(() {
+      _currentUserId = userId;
+    });
   }
 
   @override
@@ -47,6 +60,7 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
           }
 
           final ideaData = snapshot.data!['data'];
+          _currentIdeaData = ideaData;
           
           return CustomScrollView(
             slivers: [
@@ -67,7 +81,7 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
                       SizedBox(height: 24.h),
                       _buildContactSection(ideaData),
                       SizedBox(height: 32.h),
-                      _buildActionButtons(),
+                      _buildActionButtons(ideaData),
                     ],
                   ),
                 ),
@@ -248,6 +262,16 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
   }
 
   Widget _buildRatingSection(Map<String, dynamic> ideaData) {
+    final List<dynamic> ratings = ideaData['ratings'] ?? [];
+    final double averageRating = ratings.isEmpty 
+        ? 0.0 
+        : ratings.map((r) => r['rating'] as int).reduce((a, b) => a + b) / ratings.length;
+
+    final userRating = ratings.firstWhere(
+      (rating) => rating['investor']['id'] == _currentUserId,
+      orElse: () => null,
+    );
+    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.r),
@@ -265,8 +289,144 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          InkWell(
+            onTap: () => _showRatingsBottomSheet(context, ratings),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ratings & Reviews',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppArray().colors[0],
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '${ratings.length} ${ratings.length == 1 ? 'review' : 'reviews'}',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppArray().colors[3],
+                      ),
+                    ),
+                  ],
+                ),
+                if (ratings.isNotEmpty)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: AppArray().colors[0],
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          averageRating.toStringAsFixed(1),
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppArray().colors[1],
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        Icon(
+                          Icons.star,
+                          color: AppArray().colors[1],
+                          size: 20.r,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (ratings.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            Container(
+              height: 120.h,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: ratings.length,
+                itemBuilder: (context, index) {
+                  final rating = ratings[index];
+                  final isUserRating = rating['investor']['id'] == _currentUserId;
+                  return Container(
+                    width: 280.w,
+                    margin: EdgeInsets.only(right: 12.w),
+                    padding: EdgeInsets.all(12.r),
+                    decoration: BoxDecoration(
+                      color: isUserRating ? AppArray().colors[0].withOpacity(0.1) : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: isUserRating ? Border.all(color: AppArray().colors[0], width: 1) : null,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 16.r,
+                              backgroundImage: NetworkImage(
+                                rating['investor']['imageUrl'] ?? '',
+                              ),
+                              onBackgroundImageError: (_, __) => Icon(
+                                Icons.person,
+                                size: 16.r,
+                                color: AppArray().colors[0],
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              isUserRating ? 'You' : (rating['investor']['name'] ?? ''),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: AppArray().colors[0],
+                              ),
+                            ),
+                            Spacer(),
+                            Row(
+                              children: List.generate(
+                                5,
+                                (starIndex) => Icon(
+                                  starIndex < rating['rating']
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: AppArray().colors[0],
+                                  size: 14.r,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (rating['comment']?.isNotEmpty ?? false) ...[
+                          SizedBox(height: 8.h),
+                          Expanded(
+                            child: Text(
+                              rating['comment'],
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppArray().colors[3],
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+          SizedBox(height: 24.h),
           Text(
-            'Rate this Project',
+            userRating != null ? 'Edit Your Rating' : 'Add Your Rating',
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -276,9 +436,8 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
           SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              5,
-              (index) => GestureDetector(
+            children: List.generate(5, (index) {
+              return GestureDetector(
                 onTap: () {
                   setState(() {
                     _currentRating = index + 1;
@@ -288,16 +447,194 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 4.w),
                   child: Icon(
                     index < _currentRating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 36.r,
+                    color: AppArray().colors[0],
+                    size: 32.r,
                   ),
                 ),
+              );
+            }),
+          ),
+          SizedBox(height: 16.h),
+          TextField(
+            controller: _commentController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Write your review (optional)',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+          ElevatedButton(
+            onPressed: () => _submitRating(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppArray().colors[0],
+              minimumSize: Size(double.infinity, 48.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Text(
+              userRating != null ? 'Update Rating' : 'Submit Rating',
+              style: TextStyle(
+                color: AppArray().colors[1],
+                fontSize: 16.sp,
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _showRatingsBottomSheet(BuildContext context, List<dynamic> ratings) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        decoration: BoxDecoration(
+          color: AppArray().colors[1],
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.r),
+              child: Text(
+                'All Reviews',
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppArray().colors[0],
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: EdgeInsets.symmetric(horizontal: 16.r),
+                itemCount: ratings.length,
+                separatorBuilder: (context, index) => Divider(height: 24.h),
+                itemBuilder: (context, index) {
+                  final rating = ratings[index];
+                  final isUserRating = rating['investor']['id'] == _currentUserId;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20.r,
+                            backgroundImage: NetworkImage(
+                              rating['investor']['imageUrl'] ?? '',
+                            ),
+                            onBackgroundImageError: (_, __) => Icon(
+                              Icons.person,
+                              size: 20.r,
+                              color: AppArray().colors[0],
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isUserRating ? 'You' : (rating['investor']['name'] ?? ''),
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppArray().colors[0],
+                                ),
+                              ),
+                              Row(
+                                children: List.generate(
+                                  5,
+                                  (starIndex) => Icon(
+                                    starIndex < rating['rating']
+                                        ? Icons.star
+                                        : Icons.star_border,
+                                    color: AppArray().colors[0],
+                                    size: 16.r,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (isUserRating)
+                            Container(
+                              margin: EdgeInsets.only(left: 8.w),
+                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: AppArray().colors[0],
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Text(
+                                'Your Review',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: AppArray().colors[1],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      if (rating['comment']?.isNotEmpty ?? false) ...[
+                        SizedBox(height: 8.h),
+                        Text(
+                          rating['comment'],
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppArray().colors[3],
+                          ),
+                        ),
+                      ],
+                      SizedBox(height: 8.h),
+                      Text(
+                        _formatDate(rating['createdAt']),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: AppArray().colors[3],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String dateString) {
+    final date = DateTime.parse(dateString);
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        return '${difference.inMinutes} minutes ago';
+      }
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 
   Widget _buildContactSection(Map<String, dynamic> ideaData) {
@@ -364,55 +701,79 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(Map<String, dynamic> ideaData) {
     return Row(
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-            },
+            onPressed: () => _showInterest(),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppArray().colors[0],
-              padding: EdgeInsets.symmetric(vertical: 16.h),
+              minimumSize: Size(double.infinity, 48.h),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ),
             child: Text(
-              'Contact Now',
+              'Show Interest',
               style: TextStyle(
                 color: AppArray().colors[1],
                 fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-          ),
-        ),
-        SizedBox(width: 16.w),
-        Container(
-          decoration: BoxDecoration(
-            color: AppArray().colors[1],
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: AppArray().colors[0]),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: IconButton(
-            onPressed: () {
-            },
-            icon: Icon(
-              Icons.favorite_border,
-              color: AppArray().colors[0],
-              size: 24.r,
             ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _submitRating() async {
+    if (_currentRating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a rating')),
+      );
+      return;
+    }
+
+    try {
+      await _investorService.rateIdea(
+        widget.ideaId,
+        _currentRating,
+        _commentController.text,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Rating submitted successfully')),
+      );
+
+      // Refresh the idea details
+      setState(() {
+        _ideaDetailsFuture = _investorService.getIdeaDetails(widget.ideaId);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit rating: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _showInterest() async {
+    try {
+      await _investorService.showInterest(widget.ideaId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Interest shown successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to show interest: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 } 
