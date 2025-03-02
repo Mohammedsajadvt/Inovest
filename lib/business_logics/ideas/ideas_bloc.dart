@@ -26,6 +26,41 @@ class IdeasBloc extends Bloc<IdeasEvent, IdeasState> {
         emit(IdeasError("An error occurred: $e"));
       }
     });
+
+    on<DeleteIdea>((event, emit) async {
+      emit(IdeasLoading());
+      try {
+        final success = await entrepreneurService.deleteIdea(event.id);
+        if (success) {
+          emit(IdeaDeleted());
+        } else {
+          emit(IdeasError("Failed to delete idea."));
+        }
+      } catch (e) {
+        emit(IdeasError("An error occurred: $e"));
+      }
+    });
+
+    on<UpdateIdea>((event, emit) async {
+      emit(IdeasLoading());
+      try {
+        final ideas = await entrepreneurService.updateIdea(
+          event.id,
+          event.title,
+          event.abstract,
+          event.expectedInvestment,
+          event.categoryId,
+        );
+        if (ideas != null) {
+          emit(CreatedIdeas(ideas));
+        } else {
+          emit(IdeasError("Failed to update idea."));
+        }
+      } catch (e) {
+        emit(IdeasError("An error occurred: $e"));
+      }
+    });
+
     on<GetIdeas>((event, emit) async {
       emit(IdeasLoading());
       try {
@@ -39,8 +74,5 @@ class IdeasBloc extends Bloc<IdeasEvent, IdeasState> {
         emit(IdeasError("An error occurred: $e"));
       }
     });
-    
-
   }
-  
 }

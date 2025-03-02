@@ -32,3 +32,5 @@ class IdeasError extends IdeasState{
   @override
   List<Object> get props => [error];
 }
+
+class IdeaDeleted extends IdeasState {}

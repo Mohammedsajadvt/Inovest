@@ -27,3 +27,12 @@ class SearchEntrepreneurIdeas extends EntrepreneurIdeasEvent {
   @override
   List<Object> get props => [query];
 }
+
+class FilterEntrepreneurIdeas extends EntrepreneurIdeasEvent {
+  final String status;
+
+  const FilterEntrepreneurIdeas(this.status);
+
+  @override
+  List<Object> get props => [status];
+}

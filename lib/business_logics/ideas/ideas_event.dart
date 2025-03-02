@@ -36,3 +36,31 @@ class SortCategoriesEvent extends  IdeasEvent{
   @override
   List<Object> get props => [ascending];
 }
+
+class UpdateIdea extends IdeasEvent {
+  final String id;
+  final String title;
+  final String abstract;
+  final double expectedInvestment;
+  final String categoryId;
+
+  const UpdateIdea({
+    required this.id,
+    required this.title,
+    required this.abstract,
+    required this.expectedInvestment,
+    required this.categoryId,
+  });
+
+  @override
+  List<Object> get props => [id, title, abstract, expectedInvestment, categoryId];
+}
+
+class DeleteIdea extends IdeasEvent {
+  final String id;
+
+  const DeleteIdea({required this.id});
+
+  @override
+  List<Object> get props => [id];
+}
