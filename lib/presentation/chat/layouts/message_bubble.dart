@@ -1,3 +1,4 @@
+import 'package:inovest/business_logics/role/role_bloc.dart';
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/data/models/chat_message.dart';
 import 'package:inovest/core/utils/user_utils.dart';
@@ -43,22 +44,36 @@ class _MessageBubbleState extends State<MessageBubble> {
     final imageUrl = widget.message.sender?.imageUrl;
     final name = widget.message.sender?.name ?? '';
 
-    return CircleAvatar(
-      radius: 16.r,
-      backgroundColor: isMe 
-        ? AppArray().colors[0].withValues(alpha: 0.2 * 255)
-        : AppArray().colors[3].withValues(alpha: 0.2 * 255),
-      backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
-      child: imageUrl == null
-        ? Text(
-            name.isNotEmpty ? name[0].toUpperCase() : '',
-            style: TextStyle(
-              color: isMe ? AppArray().colors[0] : AppArray().colors[3],
-              fontSize: 14.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          )
-        : null,
+    return BlocBuilder<RoleBloc, RoleState>(
+      builder: (context, roleState) {
+        Color bgColor;
+        if (roleState is RoleLoading || roleState is RoleInitial) {
+          bgColor = AppArray().colors[1];
+        } else if (roleState is RoleLoaded) {
+          bgColor = roleState.role == 'INVESTOR'
+              ? AppArray().colors[0]
+              : AppArray().colors[2];
+        } else {
+          bgColor = AppArray().colors[1];
+        }
+        return CircleAvatar(
+          radius: 16.r,
+          backgroundColor: isMe
+              ? AppArray().colors[0].withValues(alpha: 0.2 * 255)
+              : AppArray().colors[3].withValues(alpha: 0.2 * 255),
+          backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+          child: imageUrl == null
+              ? Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '',
+                  style: TextStyle(
+                    color: isMe ? bgColor : AppArray().colors[3],
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
+        );
+      },
     );
   }
 
@@ -69,7 +84,8 @@ class _MessageBubbleState extends State<MessageBubble> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
       child: Column(
-        crossAxisAlignment: _isMe! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            _isMe! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           if (!_isMe! && widget.message.sender?.name != null) ...[
             Padding(
@@ -85,72 +101,85 @@ class _MessageBubbleState extends State<MessageBubble> {
             ),
           ],
           Row(
-            mainAxisAlignment: _isMe! ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment:
+                _isMe! ? MainAxisAlignment.end : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (!_isMe!) ...[
                 _buildAvatar(false),
                 SizedBox(width: 8.w),
               ],
-              Flexible(
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.75,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _isMe! 
-                      ? AppArray().colors[0]
-                      : Colors.grey[200],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20.r),
-                      topRight: Radius.circular(20.r),
-                      bottomLeft: Radius.circular(_isMe! ? 20.r : 0),
-                      bottomRight: Radius.circular(_isMe! ? 0 : 20.r),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        offset: Offset(0, 2),
-                        blurRadius: 4,
+              BlocBuilder<RoleBloc, RoleState>(
+                builder: (context, roleState) {
+                  Color bgColor;
+                  if (roleState is RoleLoading || roleState is RoleInitial) {
+                    bgColor = AppArray().colors[1];
+                  } else if (roleState is RoleLoaded) {
+                    bgColor = roleState.role == 'INVESTOR'
+                        ? AppArray().colors[0]
+                        : AppArray().colors[2];
+                  } else {
+                    bgColor = AppArray().colors[1];
+                  }
+                  return Flexible(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
                       ),
-                    ],
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 10.h,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildMessageContent(context),
-                      SizedBox(height: 4.h),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _formatTime(widget.message.createdAt),
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              color: _isMe! 
-                                ? AppArray().colors[1].withOpacity(0.7)
-                                : Colors.grey[600],
-                            ),
+                      decoration: BoxDecoration(
+                        color: _isMe! ? bgColor : Colors.grey[200],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.r),
+                          topRight: Radius.circular(20.r),
+                          bottomLeft: Radius.circular(_isMe! ? 20.r : 0),
+                          bottomRight: Radius.circular(_isMe! ? 0 : 20.r),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            offset: Offset(0, 2),
+                            blurRadius: 4,
                           ),
-                          if (_isMe!) ...[
-                            SizedBox(width: 4.w),
-                            Icon(
-                              widget.isSeen ? Icons.done_all : Icons.done,
-                              size: 14.r,
-                              color: widget.isSeen 
-                                ? AppArray().colors[1]
-                                : AppArray().colors[1].withOpacity(0.7),
-                            ),
-                          ],
                         ],
                       ),
-                    ],
-                  ),
-                ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 10.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildMessageContent(context),
+                          SizedBox(height: 4.h),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _formatTime(widget.message.createdAt),
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: _isMe!
+                                      ? AppArray().colors[1].withOpacity(0.7)
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                              if (_isMe!) ...[
+                                SizedBox(width: 4.w),
+                                Icon(
+                                  widget.isSeen ? Icons.done_all : Icons.done,
+                                  size: 14.r,
+                                  color: widget.isSeen
+                                      ? AppArray().colors[1]
+                                      : AppArray().colors[1].withOpacity(0.7),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
               if (_isMe!) ...[
                 SizedBox(width: 8.w),
@@ -175,19 +204,33 @@ class _MessageBubbleState extends State<MessageBubble> {
             fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
-              return Container(
-                width: 200.w,
-                height: 200.w,
-                color: Colors.grey[300],
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    color: _isMe! ? AppArray().colors[1] : AppArray().colors[0],
-                  ),
-                ),
+              return BlocBuilder<RoleBloc, RoleState>(
+                builder: (context, roleState) {
+                  Color bgColor;
+                  if (roleState is RoleLoading || roleState is RoleInitial) {
+                    bgColor = AppArray().colors[1];
+                  } else if (roleState is RoleLoaded) {
+                    bgColor = roleState.role == 'INVESTOR'
+                        ? AppArray().colors[0]
+                        : AppArray().colors[2];
+                  } else {
+                    bgColor = AppArray().colors[1];
+                  }
+                  return Container(
+                    width: 200.w,
+                    height: 200.w,
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: _isMe! ? AppArray().colors[1] : bgColor,
+                      ),
+                    ),
+                  );
+                },
               );
             },
             errorBuilder: (context, error, stackTrace) {
@@ -210,10 +253,10 @@ class _MessageBubbleState extends State<MessageBubble> {
           widget.message.content,
           style: TextStyle(
             fontSize: 14.sp,
-            color: _isMe! ? AppArray().colors[1] : AppArray().colors[0],
+            color:_isMe!? AppArray().colors[1]: AppArray().colors[0],
             height: 1.3,
           ),
         );
     }
   }
-} 
+}

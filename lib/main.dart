@@ -1,9 +1,11 @@
+import 'package:inovest/business_logics/role/role_bloc.dart';
+
 import '/core/utils/index.dart';
 import 'package:inovest/firebase_options.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:inovest/business_logics/chat/chat_bloc.dart';
 import 'package:inovest/data/services/chat_service.dart';
-import 'package:inovest/core/services/deep_link_service.dart';
+import 'package:inovest/data/services/deep_link_service.dart';
 
 
 bool _isFirebaseInitialized = false;
@@ -39,7 +41,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SharedPreferences.getInstance();
-
   await initializeFirebase();
 
   if (!kIsWeb) {
@@ -70,6 +71,7 @@ Future<void> main() async {
           ),
         ),
         BlocProvider(create: (context) => ChatBloc(chatService)),
+        BlocProvider(create: (context)=> RoleBloc()),
       ],
       child: MyApp(),
     ),
