@@ -8,10 +8,12 @@ class SocketService {
   Function(ChatMessage)? onNewMessage;
   Function(String, bool)? onTypingStatus;
   Function(String, String)? onUserStatus;
+  Function(Map<String, dynamic>)? onNewNotification;
 
-  Future<void> connect(String userId) async {
+  Future<void> connect() async {
     
     final token = await SecureStorage().getToken();
+    final userId = await SecureStorage().getUserId();
 
     socket = io.io(ApiConstants.serverUrl, <String, dynamic>{
       'transports': ['websocket'],
@@ -28,6 +30,12 @@ class SocketService {
 
     socket!.on('disconnect', (_) {
       print('Disconnected from socket server');
+    });
+
+    socket!.on('new_notification', (data) {
+      if (onNewNotification != null) {
+        onNewNotification!(data);
+      }
     });
 
     socket!.on('new_message', (data) {
