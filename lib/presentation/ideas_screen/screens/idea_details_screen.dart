@@ -705,20 +705,65 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
     return Row(
       children: [
         Expanded(
-          child: ElevatedButton(
-            onPressed: () => _showInterest(),
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              final result = await NavigationHelper.navigateToPayment(
+                context,
+                amount: double.parse(ideaData['expectedInvestment'].toString()),
+                userId: ideaData['entrepreneur']['id'],
+                projectId: widget.ideaId,
+              );
+              
+              if (result == true) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Investment successful!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  setState(() {
+                    _ideaDetailsFuture = _investorService.getIdeaDetails(widget.ideaId);
+                  });
+                }
+              }
+            },
+            icon: Icon(Icons.payment, color: AppArray().colors[1]),
+            label: Text(
+              'Invest Now',
+              style: TextStyle(
+                color: AppArray().colors[1],
+                fontSize: 16.sp,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppArray().colors[0],
-              minimumSize: Size(double.infinity, 48.h),
+              padding: EdgeInsets.symmetric(vertical: 12.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
             ),
-            child: Text(
-              'Show Interest',
+          ),
+        ),
+        SizedBox(width: 16.w),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pushNamed(context, '/chats');
+            },
+            icon: Icon(Icons.chat, color: AppArray().colors[1]),
+            label: Text(
+              'Chat with Owner',
               style: TextStyle(
                 color: AppArray().colors[1],
                 fontSize: 16.sp,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppArray().colors[2],
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ),
           ),
@@ -753,20 +798,6 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to submit rating: ${e.toString()}')),
-      );
-    }
-  }
-
-  Future<void> _showInterest() async {
-    try {
-      await _investorService.showInterest(widget.ideaId);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Interest shown successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to show interest: ${e.toString()}')),
       );
     }
   }
