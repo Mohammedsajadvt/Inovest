@@ -8,7 +8,6 @@ import 'package:inovest/data/services/socket_service.dart';
 import 'package:inovest/core/common/app_array.dart';
 import '../layouts/message_bubble.dart';
 import '../layouts/chat_input.dart';
-import 'package:inovest/core/utils/user_utils.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final Chat chat;
@@ -35,14 +34,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   void _setupSocket() async {
-    final userId = await UserUtils.getCurrentUserId();
-    if (userId != null) {
-      _socketService.connect(userId);
+      _socketService.connect();
       _socketService.joinChat(widget.chat.id);
       _socketService.onNewMessage = (message) {
         context.read<ChatBloc>().add(ReceiveMessage(message));
       };
-    }
   }
 
   @override

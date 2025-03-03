@@ -227,7 +227,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                     if (_formKey.currentState!.validate()) {
                                       if (selectedCategory != null) {
                                         if (widget.projectToEdit != null) {
-                                          // Update existing project
                                           context.read<IdeasBloc>().add(
                                                 UpdateIdea(
                                                   id: widget.projectToEdit!.id,
@@ -238,7 +237,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                                 ),
                                               );
                                         } else {
-                                          // Create new project
                                           context.read<IdeasBloc>().add(
                                                 CreateIdeas(
                                                   title: _titleController.text,
