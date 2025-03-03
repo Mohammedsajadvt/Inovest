@@ -8,11 +8,17 @@ import 'package:inovest/business_logics/category/category_event.dart';
 import 'package:inovest/business_logics/category/category_state.dart';
 import 'package:inovest/business_logics/profile/profile_bloc.dart';
 import 'package:inovest/data/models/category_model.dart';
+import 'package:inovest/data/models/entrepreneur_ideas_model.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/core/utils/index.dart';
 
 class AddProjectScreen extends StatefulWidget {
-  const AddProjectScreen({super.key});
+  final EntrepreneurIdea? projectToEdit;
+  
+  const AddProjectScreen({
+    super.key,
+    this.projectToEdit,
+  });
 
   @override
   State<AddProjectScreen> createState() => _AddProjectScreenState();
@@ -29,6 +35,16 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   void initState() {
     super.initState();
     context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
+    
+    // Initialize fields if editing
+    if (widget.projectToEdit != null) {
+      _titleController.text = widget.projectToEdit!.title;
+      _abstractController.text = widget.projectToEdit!.abstract;
+      _currentRangeValues = RangeValues(
+        widget.projectToEdit!.expectedInvestment,
+        widget.projectToEdit!.expectedInvestment,
+      );
+    }
   }
 
   @override
@@ -38,7 +54,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
       appBar: AppBar(
         backgroundColor: AppArray().colors[1],
         title: Text(
-          'Add new project',
+          widget.projectToEdit != null ? 'Edit project' : 'Add new project',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -114,9 +130,17 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                       if (state is GetCategoryLoading) {
                         return Center(child: CircularProgressIndicator());
                       } else if (state is GetCategoryLoaded) {
+                        if (widget.projectToEdit != null && selectedCategory == null) {
+                          selectedCategory = state.categories.firstWhere(
+                            (category) => category.id == widget.projectToEdit!.category.id,
+                            orElse: () => state.categories.first,
+                          );
+                        }
+                        
                         return DropdownButtonFormField<CategoryModel>(
                           dropdownColor: AppArray().colors[1],
                           decoration: _inputDecoration('Select Industry'),
+                          value: selectedCategory,
                           items: state.categories.map((CategoryModel category) {
                             return DropdownMenuItem<CategoryModel>(
                               value: category,
@@ -202,18 +226,28 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                 : () {
                                     if (_formKey.currentState!.validate()) {
                                       if (selectedCategory != null) {
-                                        context.read<IdeasBloc>().add(
-                                              CreateIdeas(
-                                                title: _titleController.text,
-                                                abstract:
-                                                    _abstractController.text,
-                                                expectedInvestment:
-                                                    _currentRangeValues.start
-                                                        .toDouble(),
-                                                categoryId:
-                                                    selectedCategory!.id,
-                                              ),
-                                            );
+                                        if (widget.projectToEdit != null) {
+                                          // Update existing project
+                                          context.read<IdeasBloc>().add(
+                                                UpdateIdea(
+                                                  id: widget.projectToEdit!.id,
+                                                  title: _titleController.text,
+                                                  abstract: _abstractController.text,
+                                                  expectedInvestment: _currentRangeValues.start.toDouble(),
+                                                  categoryId: selectedCategory!.id,
+                                                ),
+                                              );
+                                        } else {
+                                          // Create new project
+                                          context.read<IdeasBloc>().add(
+                                                CreateIdeas(
+                                                  title: _titleController.text,
+                                                  abstract: _abstractController.text,
+                                                  expectedInvestment: _currentRangeValues.start.toDouble(),
+                                                  categoryId: selectedCategory!.id,
+                                                ),
+                                              );
+                                        }
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(

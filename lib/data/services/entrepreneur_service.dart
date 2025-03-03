@@ -102,6 +102,55 @@ class EntrepreneurService {
     }
   }
 
+  Future<IdeasModel?> updateIdea(String id, String title, String abstract,
+      double expectedInvestment, String categoryId) async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.entrepreneurIdeas}/$id";
+    final token = await SecureStorage().getToken();
+    try {
+      final response = await _makeRequest(
+        url,
+        "PUT",
+        body: jsonEncode({
+          "title": title,
+          "abstract": abstract,
+          "expectedInvestment": expectedInvestment,
+          "categoryId": categoryId
+        }),
+        token: token,
+      );
+
+      if (response != null && response.statusCode == 200) {
+        print("Idea updated successfully: ${response.body}");
+        return IdeasModel.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Error: ${response?.statusCode} - ${response?.body}');
+      }
+    } catch (e) {
+      throw Exception('Failed to update idea: $e');
+    }
+  }
+
+  Future<bool> deleteIdea(String id) async {
+    final String url = "${ApiConstants.baseUrl}${ApiConstants.entrepreneurIdeas}/$id";
+    final token = await SecureStorage().getToken();
+    try {
+      final response = await _makeRequest(
+        url,
+        "DELETE",
+        token: token,
+      );
+
+      if (response != null && response.statusCode == 200) {
+        print("Idea deleted successfully");
+        return true;
+      } else {
+        throw Exception('Error: ${response?.statusCode} - ${response?.body}');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete idea: $e');
+    }
+  }
+
   Future<http.Response?> _makeRequest(String url, String method,
       {String? body, String? token}) async {
     final headers = {
@@ -112,10 +161,18 @@ class EntrepreneurService {
     try {
       http.Response response;
 
-      if (method == "POST") {
-        response = await http.post(Uri.parse(url), headers: headers, body: body);
-      } else {
-        response = await http.get(Uri.parse(url), headers: headers);
+      switch (method) {
+        case "POST":
+          response = await http.post(Uri.parse(url), headers: headers, body: body);
+          break;
+        case "PUT":
+          response = await http.put(Uri.parse(url), headers: headers, body: body);
+          break;
+        case "DELETE":
+          response = await http.delete(Uri.parse(url), headers: headers);
+          break;
+        default:
+          response = await http.get(Uri.parse(url), headers: headers);
       }
 
       if (response.statusCode == 401) {
@@ -130,11 +187,20 @@ class EntrepreneurService {
             "Authorization": "Bearer $token",
           };
 
-          if (method == "POST") {
-            response = await http.post(Uri.parse(url),
-                headers: refreshedHeaders, body: body);
-          } else {
-            response = await http.get(Uri.parse(url), headers: refreshedHeaders);
+          switch (method) {
+            case "POST":
+              response = await http.post(Uri.parse(url),
+                  headers: refreshedHeaders, body: body);
+              break;
+            case "PUT":
+              response = await http.put(Uri.parse(url),
+                  headers: refreshedHeaders, body: body);
+              break;
+            case "DELETE":
+              response = await http.delete(Uri.parse(url), headers: refreshedHeaders);
+              break;
+            default:
+              response = await http.get(Uri.parse(url), headers: refreshedHeaders);
           }
           
           if (response.statusCode == 401) {
