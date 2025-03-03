@@ -26,7 +26,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
 
     UnauthorizedNotifier().onUnauthorized.listen((_) {
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (route) => false);
       }
     });
   }
@@ -174,7 +175,9 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                   setState(() {
                     _isSearching = value.isNotEmpty;
                   });
-                  context.read<InvestorIdeasBloc>().add(SearchInvestorIdeas(query: value));
+                  context
+                      .read<InvestorIdeasBloc>()
+                      .add(SearchInvestorIdeas(query: value));
                 },
               ),
             ],
@@ -188,8 +191,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
               username: state.profileModel.data.name,
               email: state.profileModel.data.email,
               imageUrl: state.profileModel.data.imageUrl ?? '',
-             onHomeTap: () {
-              },
+              onHomeTap: () {},
               onProfileTap: () {},
               onSettingsTap: () {
                 Navigator.of(context).pushNamed('/settings');
@@ -231,7 +233,7 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                   SizedBox(height: 10.h),
                   BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
                     builder: (context, state) {
-                      if (state is InvestorIdeasLoaded && 
+                      if (state is InvestorIdeasLoaded &&
                           state.investorCategories != null) {
                         final categories = state.investorCategories!;
                         if (categories.data!.isEmpty) {
@@ -247,12 +249,13 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                             itemBuilder: (context, index) {
                               bool isFilledStyle = index % 2 == 1;
                               final category = categories.data[index];
-                              
+
                               return Padding(
                                 padding: EdgeInsets.only(right: 12.w),
                                 child: GestureDetector(
                                   onTap: () async {
-                                    final result = await Navigator.of(context).push(
+                                    final result =
+                                        await Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) => IdeasScreen(
                                           title: category.name,
@@ -271,7 +274,9 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                       maxWidth: 200.w,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: isFilledStyle ? AppArray().colors[0] : Colors.transparent,
+                                      color: isFilledStyle
+                                          ? AppArray().colors[0]
+                                          : Colors.transparent,
                                       border: Border.all(
                                         color: AppArray().colors[0],
                                         width: 2.w,
@@ -280,12 +285,15 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                     ),
                                     child: Center(
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24.w, vertical: 16.h),
                                         child: Text(
                                           category.name.toUpperCase(),
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            color: isFilledStyle ? AppArray().colors[1] : AppArray().colors[0],
+                                            color: isFilledStyle
+                                                ? AppArray().colors[1]
+                                                : AppArray().colors[0],
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w600,
                                             letterSpacing: 0.5,
@@ -300,7 +308,10 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                           ),
                         );
                       }
-                      return  Center(child: CircularProgressIndicator(color: AppArray().colors[0],));
+                      return Center(
+                          child: CircularProgressIndicator(
+                        color: AppArray().colors[0],
+                      ));
                     },
                   ),
                   SizedBox(
@@ -318,11 +329,13 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h).r,
+                            padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w, vertical: 15.h)
+                                .r,
                             child: Text(
                               'Top 5',
                               style: TextStyle(
-                                  fontSize: 20.sp, 
+                                  fontSize: 20.sp,
                                   fontWeight: FontWeight.w600,
                                   color: AppArray().colors[0]),
                             ),
@@ -333,18 +346,17 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 if (state.topIdeas != null &&
                                     state.topIdeas!.data != null &&
                                     state.topIdeas!.data!.isNotEmpty) {
-                                  final sortedData =
-                                      List.from(state.topIdeas!.data!)
-                                        ..sort((a, b) {
-                                          final aRatings = a.count?.ratings ?? 0;
-                                          final bRatings = b.count?.ratings ?? 0;
-                                          final ratingComparison =
-                                              bRatings.compareTo(aRatings);
-                                          if (ratingComparison != 0)
-                                            return ratingComparison;
-                                          return b.createdAt
-                                              .compareTo(a.createdAt);
-                                        });
+                                  final sortedData = List.from(
+                                      state.topIdeas!.data!)
+                                    ..sort((a, b) {
+                                      final aRatings = a.count?.ratings ?? 0;
+                                      final bRatings = b.count?.ratings ?? 0;
+                                      final ratingComparison =
+                                          bRatings.compareTo(aRatings);
+                                      if (ratingComparison != 0)
+                                        return ratingComparison;
+                                      return b.createdAt.compareTo(a.createdAt);
+                                    });
 
                                   return ListView.builder(
                                     shrinkWrap: true,
@@ -398,7 +410,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                 highlightColor: Colors.grey[100]!,
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
                                   itemCount: 5,
                                   itemBuilder: (context, index) {
                                     return Padding(
@@ -446,13 +459,15 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                       if (state is InvestorIdeasLoaded) {
                         if (state.topIdeas == null ||
                             state.topIdeas!.data == null) {
-                          return const Center(child: Text('No ideas available'));
+                          return const Center(
+                              child: Text('No ideas available'));
                         }
 
                         final Map<String, List<Datum>> groupedIdeas = {};
                         for (var idea in state.topIdeas!.data!) {
                           if (idea.category != null) {
-                            groupedIdeas.putIfAbsent(idea.category!.id, () => []);
+                            groupedIdeas.putIfAbsent(
+                                idea.category!.id, () => []);
                             groupedIdeas[idea.category!.id]!.add(idea);
                           }
                         }
@@ -470,7 +485,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                           itemCount: uniqueCategories.length,
                           itemBuilder: (context, index) {
                             final category = uniqueCategories[index];
-                            final categoryIdeas = groupedIdeas[category.id] ?? [];
+                            final categoryIdeas =
+                                groupedIdeas[category.id] ?? [];
                             final colors = [
                               Color(0xFFFFF8E1),
                               Color(0xFFE0F2F1),
@@ -500,9 +516,12 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                         ),
                                         GestureDetector(
                                           onTap: () async {
-                                            final result = await Navigator.of(context).push(
+                                            final result =
+                                                await Navigator.of(context)
+                                                    .push(
                                               MaterialPageRoute(
-                                                builder: (context) => IdeasScreen(
+                                                builder: (context) =>
+                                                    IdeasScreen(
                                                   title: category.name,
                                                   categoryId: category.id,
                                                   shouldLoadOnInit: true,
@@ -517,7 +536,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                             padding: EdgeInsets.all(8.r),
                                             decoration: BoxDecoration(
                                               color: AppArray().colors[0],
-                                              borderRadius: BorderRadius.circular(30.r),
+                                              borderRadius:
+                                                  BorderRadius.circular(30.r),
                                             ),
                                             child: Icon(
                                               Icons.arrow_forward,
@@ -544,75 +564,107 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                           final idea = categoryIdeas[ideaIndex];
                                           return Container(
                                             width: 250.w,
-                                            margin: EdgeInsets.only(right: 15.w),
+                                            margin:
+                                                EdgeInsets.only(right: 15.w),
                                             child: Card(
                                               elevation: 5,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(15.r),
+                                                borderRadius:
+                                                    BorderRadius.circular(15.r),
                                               ),
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(15.r),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15.r),
                                                   gradient: LinearGradient(
                                                     begin: Alignment.topLeft,
                                                     end: Alignment.bottomRight,
                                                     colors: [
                                                       AppArray().colors[1],
-                                                      AppArray().colors[1].withValues(alpha: 229),
+                                                      AppArray()
+                                                          .colors[1]
+                                                          .withValues(
+                                                              alpha: 229),
                                                     ],
                                                   ),
                                                 ),
                                                 child: Padding(
                                                   padding: EdgeInsets.all(15.r),
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         idea.title,
                                                         style: TextStyle(
                                                           fontSize: 18.sp,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: AppArray().colors[0],
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: AppArray()
+                                                              .colors[0],
                                                         ),
                                                         maxLines: 2,
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       ),
                                                       SizedBox(height: 10.h),
                                                       Text(
                                                         idea.datumAbstract,
                                                         style: TextStyle(
                                                           fontSize: 14.sp,
-                                                          color: AppArray().colors[3],
+                                                          color: AppArray()
+                                                              .colors[3],
                                                           height: 1.2,
                                                         ),
                                                         maxLines: 3,
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       ),
                                                       Spacer(),
                                                       Container(
                                                         width: double.infinity,
                                                         child: ElevatedButton(
                                                           onPressed: () {
-                                                            Navigator.of(context).push(
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
                                                               MaterialPageRoute(
-                                                                builder: (context) => IdeaDetailsScreen(
-                                                                  ideaId: idea.id,
+                                                                builder:
+                                                                    (context) =>
+                                                                        IdeaDetailsScreen(
+                                                                  ideaId:
+                                                                      idea.id,
                                                                 ),
                                                               ),
                                                             );
                                                           },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: AppArray().colors[0],
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(10.r),
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                AppArray()
+                                                                    .colors[0],
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.r),
                                                             ),
-                                                            padding: EdgeInsets.symmetric(vertical: 10.h),
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        10.h),
                                                           ),
                                                           child: Text(
                                                             'Know more',
                                                             style: TextStyle(
-                                                              color: AppArray().colors[1],
-                                                              fontWeight: FontWeight.w600,
+                                                              color: AppArray()
+                                                                  .colors[1],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
                                                             ),
                                                           ),
                                                         ),
@@ -643,7 +695,8 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: BlocBuilder<InvestorIdeasBloc, InvestorIdeasState>(
                       builder: (context, state) {
-                        if (state is InvestorIdeasLoaded && state.topIdeas?.data != null) {
+                        if (state is InvestorIdeasLoaded &&
+                            state.topIdeas?.data != null) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -671,17 +724,20 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: state.topIdeas!.data!.length,
                                       itemBuilder: (context, index) {
-                                        final idea = state.topIdeas!.data![index];
+                                        final idea =
+                                            state.topIdeas!.data![index];
                                         return Card(
                                           margin: EdgeInsets.only(bottom: 15.h),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(15.r),
+                                            borderRadius:
+                                                BorderRadius.circular(15.r),
                                           ),
                                           child: InkWell(
                                             onTap: () {
                                               Navigator.of(context).push(
                                                 MaterialPageRoute(
-                                                  builder: (context) => IdeaDetailsScreen(
+                                                  builder: (context) =>
+                                                      IdeaDetailsScreen(
                                                     ideaId: idea.id,
                                                   ),
                                                 ),
@@ -690,41 +746,52 @@ class _InvestorHomeScreenState extends State<InvestorHomeScreen>
                                             child: Padding(
                                               padding: EdgeInsets.all(15.r),
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     idea.title,
                                                     style: TextStyle(
                                                       fontSize: 18.sp,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppArray().colors[0],
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          AppArray().colors[0],
                                                     ),
                                                   ),
                                                   SizedBox(height: 8.h),
                                                   Text(
                                                     idea.datumAbstract,
                                                     maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       fontSize: 14.sp,
-                                                      color: AppArray().colors[3],
+                                                      color:
+                                                          AppArray().colors[3],
                                                     ),
                                                   ),
-                                                  if (idea.category != null) ...[
+                                                  if (idea.category !=
+                                                      null) ...[
                                                     SizedBox(height: 8.h),
                                                     Container(
-                                                      padding: EdgeInsets.symmetric(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
                                                         horizontal: 12.w,
                                                         vertical: 6.h,
                                                       ),
                                                       decoration: BoxDecoration(
-                                                        color: AppArray().colors[0],
-                                                        borderRadius: BorderRadius.circular(20.r),
+                                                        color: AppArray()
+                                                            .colors[0],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.r),
                                                       ),
                                                       child: Text(
                                                         idea.category!.name,
                                                         style: TextStyle(
-                                                          color: AppArray().colors[1],
+                                                          color: AppArray()
+                                                              .colors[1],
                                                           fontSize: 12.sp,
                                                         ),
                                                       ),

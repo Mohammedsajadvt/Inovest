@@ -95,13 +95,14 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                           ),
                         ),
                       );
-                    }else if(state is  ProfileLoading){
-                     return Padding(
+                    } else if (state is ProfileLoading) {
+                      return Padding(
                         padding: EdgeInsets.only(right: 10.r),
-                       child: CircleAvatar(backgroundColor: Colors.white,),
-                     );
-                    } 
-                    else if (state is ProfileError) {
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                        ),
+                      );
+                    } else if (state is ProfileError) {
                       print(state.message);
                     }
                     return const SizedBox.shrink();
