@@ -14,6 +14,7 @@ class DeepLinkService {
     }
   }
 
+
   static Future<void> _handleMobileDeepLink(BuildContext context) async {
     try {
       final Uri? initialLink = await _appLinks.getInitialLink();
@@ -41,7 +42,7 @@ class DeepLinkService {
   static void _handleWebDeepLink(BuildContext context) {
     if (!kIsWeb) return;
 
-    final uri = Uri.base; 
+    final uri = Uri.base;
     print('Web deep link: $uri');
 
     if (uri.path == '/reset-password') {
