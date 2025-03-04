@@ -27,7 +27,8 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
     return Scaffold(
       backgroundColor: AppArray().colors[1],
       appBar: AppBar(
-        backgroundColor: AppArray().colors[1],
+        backgroundColor: AppArray().colors[2],
+        foregroundColor: AppArray().colors[1],
         title: Text(
           'My Projects',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -322,16 +323,17 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
+                                      backgroundColor: AppArray().colors[1],
                                       title: Text('Delete Project'),
                                       content: Text('Are you sure you want to delete this project?'),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () => Navigator.of(context).pop(false),
-                                          child: Text('Cancel'),
+                                          child: Text('Cancel',style: TextStyle(color: Colors.red,)),
                                         ),
                                         TextButton(
                                           onPressed: () => Navigator.of(context).pop(true),
-                                          child: Text('Delete'),
+                                          child: Text('Delete',style: TextStyle(color: AppArray().colors[2],)),
                                         ),
                                       ],
                                     );

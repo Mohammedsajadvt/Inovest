@@ -36,7 +36,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
     super.initState();
     context.read<GetCategoriesBloc>().add(FetchCategoriesEvent());
     
-    // Initialize fields if editing
     if (widget.projectToEdit != null) {
       _titleController.text = widget.projectToEdit!.title;
       _abstractController.text = widget.projectToEdit!.abstract;
@@ -52,7 +51,8 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
     return Scaffold(
       backgroundColor: AppArray().colors[1],
       appBar: AppBar(
-        backgroundColor: AppArray().colors[1],
+        backgroundColor: AppArray().colors[2],
+        foregroundColor: AppArray().colors[1],
         title: Text(
           widget.projectToEdit != null ? 'Edit project' : 'Add new project',
           style: TextStyle(fontWeight: FontWeight.bold),
