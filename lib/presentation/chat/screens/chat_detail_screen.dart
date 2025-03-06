@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/business_logics/chat/chat_bloc.dart';
+import 'package:inovest/business_logics/chat/chat_event.dart';
+import 'package:inovest/business_logics/chat/chat_state.dart';
 import 'package:inovest/business_logics/role/role_bloc.dart';
 import 'package:inovest/data/models/chat.dart';
 import 'package:inovest/data/models/chat_message.dart';

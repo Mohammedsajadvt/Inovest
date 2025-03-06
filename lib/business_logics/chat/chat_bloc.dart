@@ -1,51 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inovest/data/models/chat.dart';
-import 'package:inovest/data/models/chat_message.dart';
+import 'package:inovest/business_logics/chat/chat_event.dart';
+import 'package:inovest/business_logics/chat/chat_state.dart';
 import 'package:inovest/data/services/chat_service.dart';
 
-abstract class ChatEvent {}
 
-class LoadChats extends ChatEvent {}
 
-class LoadChatMessages extends ChatEvent {
-  final String chatId;
-  LoadChatMessages(this.chatId);
-}
-
-class SendMessage extends ChatEvent {
-  final String chatId;
-  final String content;
-  final MessageType messageType;
-  SendMessage(this.chatId, this.content, this.messageType);
-}
-
-class ReceiveMessage extends ChatEvent {
-  final ChatMessage message;
-  ReceiveMessage(this.message);
-}
-
-abstract class ChatState {}
-
-class ChatInitial extends ChatState {}
-
-class ChatsLoading extends ChatState {}
-
-class ChatsLoaded extends ChatState {
-  final List<Chat> chats;
-  ChatsLoaded(this.chats);
-}
-
-class ChatMessagesLoading extends ChatState {}
-
-class ChatMessagesLoaded extends ChatState {
-  final List<ChatMessage> messages;
-  ChatMessagesLoaded(this.messages);
-}
-
-class ChatError extends ChatState {
-  final String message;
-  ChatError(this.message);
-}
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatService _chatService;
