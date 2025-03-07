@@ -3,28 +3,29 @@ import 'package:inovest/business_logics/role/role_bloc.dart';
 import 'package:inovest/core/utils/index.dart';
 import 'package:inovest/data/services/chat_service.dart';
 
-class BlocProvidersList{
-  
+class BlocProvidersList {
   final AuthService authService = AuthService();
   final EntrepreneurService entrepreneurService = EntrepreneurService();
   final ProfileService profileService = ProfileService();
   final InvestorService investorService = InvestorService();
   final ChatService chatService = ChatService();
-   List<BlocProvider> getAllProviders(){
+  List<BlocProvider> getAllProviders() {
     return [
-        BlocProvider(create: (context) => CheckBoxBloc()),
-        BlocProvider(create: (context) => AuthBloc(authService: authService)),
-        BlocProvider(create: (context) => IdeasBloc(entrepreneurService)),
-        BlocProvider(create: (context) => GetCategoriesBloc(entrepreneurService)),
-        BlocProvider(create: (context) => ProfileBloc(profileService)),
-        BlocProvider(create: (context) => InvestorIdeasBloc(investorService)),
-        BlocProvider<EntrepreneurIdeasBloc>(
-          create: (context) => EntrepreneurIdeasBloc(
-            entrepreneurService: EntrepreneurService(),
-          ),
+      BlocProvider<CheckBoxBloc>(create: (_) => CheckBoxBloc()),
+      BlocProvider<AuthBloc>(create: (_) => AuthBloc(authService: authService)),
+      BlocProvider<IdeasBloc>(create: (_) => IdeasBloc(entrepreneurService)),
+      BlocProvider<GetCategoriesBloc>(
+          create: (_) => GetCategoriesBloc(entrepreneurService)),
+      BlocProvider<ProfileBloc>(create: (_) => ProfileBloc(profileService)),
+      BlocProvider<InvestorIdeasBloc>(
+          create: (_) => InvestorIdeasBloc(investorService)),
+      BlocProvider<EntrepreneurIdeasBloc>(
+        create: (_) => EntrepreneurIdeasBloc(
+          entrepreneurService: EntrepreneurService(),
         ),
-        BlocProvider(create: (context) => ChatBloc(chatService)),
-        BlocProvider(create: (context)=> RoleBloc()),
+      ),
+      BlocProvider<ChatBloc>(create: (_) => ChatBloc(chatService)),
+      BlocProvider<RoleBloc>(create: (_) => RoleBloc()),
     ];
   }
 }
