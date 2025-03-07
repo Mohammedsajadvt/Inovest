@@ -110,6 +110,7 @@ class _EntrepreneurHomeScreenState extends State<EntrepreneurHomeScreen> {
           },
           child: Column(
             children: [
+              SizedBox(height: 10.h,),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                 child: Row(
