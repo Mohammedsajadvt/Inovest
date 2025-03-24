@@ -94,4 +94,20 @@ class ChatService {
       throw Exception('Failed to send message');
     }
   }
+
+  Future<Chat> initializeChat(String investorId, String projectId) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('${ApiConstants.baseUrl}/chat/initialize/$investorId/$projectId'),
+        headers: {
+          'Authorization': 'Bearer ${await _secureStorage.getToken()}',
+          'Content-Type': 'application/json',
+        },
+      );
+      final chatData = json.decode(response.body)['data'];
+      return Chat.fromJson(chatData);
+    } catch (e) {
+      throw Exception('Failed to initialize chat: $e');
+    }
+  }
 } 

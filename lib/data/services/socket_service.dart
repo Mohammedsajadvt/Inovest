@@ -90,4 +90,15 @@ class SocketService {
       socket = null; 
     }
   }
+
+  void emitMessage(String chatId, ChatMessage message) {
+    if (socket != null && socket!.connected) {
+      socket!.emit('send_message', {
+        'chatId': chatId,
+        'message': message.toJson(),
+      });
+    } else {
+      print('Socket is not connected.');
+    }
+  }
 }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inovest/core/common/app_array.dart';
 import 'package:inovest/data/services/investor_service.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:inovest/core/utils/navigation_helper.dart';
 import 'package:inovest/core/utils/user_utils.dart';
+import 'package:inovest/business_logics/chat/chat_bloc.dart';
+import 'package:inovest/business_logics/chat/chat_event.dart';
+import 'package:inovest/business_logics/chat/chat_state.dart';
+import 'package:inovest/presentation/chat/screens/chat_detail_screen.dart';
 
 class IdeaDetailsScreen extends StatefulWidget {
   final String ideaId;
@@ -748,8 +753,36 @@ class _IdeaDetailsScreenState extends State<IdeaDetailsScreen> {
         SizedBox(width: 16.w),
         Expanded(
           child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(context, '/chats');
+            onPressed: () async {
+              try {
+                context.read<ChatBloc>().add(InitializeChat(_currentUserId!, widget.ideaId));
+                final state = await context.read<ChatBloc>().stream.firstWhere(
+                  (state) => state is ChatInitialized || state is ChatError,
+                );
+                
+                if (state is ChatInitialized) {
+                  if (mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatDetailScreen(chat: state.chat),
+                      ),
+                    );
+                  }
+                } else if (state is ChatError) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message)),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to initialize chat: $e')),
+                  );
+                }
+              }
             },
             icon: Icon(Icons.chat, color: AppArray().colors[1]),
             label: Text(

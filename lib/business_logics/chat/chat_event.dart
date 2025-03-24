@@ -20,3 +20,9 @@ class ReceiveMessage extends ChatEvent {
   final ChatMessage message;
   ReceiveMessage(this.message);
 }
+
+class InitializeChat extends ChatEvent {
+  final String investorId;
+  final String projectId;
+  InitializeChat(this.investorId, this.projectId);
+}

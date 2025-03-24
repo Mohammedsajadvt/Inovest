@@ -1,4 +1,5 @@
 import '../index.dart';
+import '../widgets/role_switch_button.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -168,6 +169,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 10),
+                      if (state is GetProfileloaded)
+                        RoleSwitchButton(
+                          currentRole: state.profileModel.data.role.currentRole,
+                        ),
                       SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,

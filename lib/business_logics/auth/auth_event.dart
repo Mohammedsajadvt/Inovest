@@ -33,3 +33,12 @@ class SignUpEvent extends AuthEvent {
 class TokenExpiredEvent extends AuthEvent{}
 
 class LogoutEvent extends AuthEvent {}
+
+class SwitchRoleEvent extends AuthEvent {
+  final String newRole;
+
+  const SwitchRoleEvent({required this.newRole});
+
+  @override
+  List<Object> get props => [newRole];
+}

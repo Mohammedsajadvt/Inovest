@@ -14,6 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpEvent>(_onSignup);
     on<TokenExpiredEvent>(_onTokenExpired);
     on<LogoutEvent>(_onLogout);
+    on<SwitchRoleEvent>(_onSwitchRole);
   }
 
   Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
@@ -133,6 +134,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure(message: 'Logout failed: $e'));
+    }
+  }
+
+  Future<void> _onSwitchRole(SwitchRoleEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final userId = await UserUtils.getCurrentUserId();
+      if (userId == null) {
+        emit(AuthFailure(message: 'User not authenticated'));
+        return;
+      }
+
+      final response = await authService.switchRole(userId, event.newRole);
+      
+      if (response != null && response.success) {
+        emit(AuthSuccess(
+          message: "Role switched successfully",
+          role: event.newRole,
+        ));
+      } else {
+        emit(AuthFailure(message: response?.message ?? "Failed to switch role"));
+      }
+    } catch (e) {
+      emit(AuthFailure(message: 'Role switch failed: $e'));
     }
   }
 }

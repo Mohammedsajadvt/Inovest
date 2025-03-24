@@ -1,4 +1,3 @@
-
 import 'package:inovest/data/models/chat.dart';
 import 'package:inovest/data/models/chat_message.dart';
 
@@ -23,4 +22,9 @@ class ChatMessagesLoaded extends ChatState {
 class ChatError extends ChatState {
   final String message;
   ChatError(this.message);
+}
+
+class ChatInitialized extends ChatState {
+  final Chat chat;
+  ChatInitialized(this.chat);
 }
